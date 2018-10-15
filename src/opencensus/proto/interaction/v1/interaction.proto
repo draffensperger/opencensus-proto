@@ -1,0 +1,62 @@
+// Copyright 2016-18, OpenCensus Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package opencensus.proto.interaction.v1;
+
+option go_package = "github.com/draffensperger/opencensus-web/gen-go/interactionproto";
+
+option java_multiple_files = true;
+option java_package = "io.opencensus.proto.interaction";
+option java_outer_classname = "InteractionProto";
+
+// A UI interation represents a measurable user interaction in a user interface
+// client (usually a web browser or mobile app). UI actions will be transformed
+// into spans and metrics by specialized interceptors in the OpenCensus agent.
+//
+// Clients will typically communicate with the agent over the open internet,
+// and for web clients, the communication with be over HTTP. For web clients
+// particularly, it's also important that the amount of client code be small.
+// These considerations impact how the fields in this proto are specified.
+message Interaction {
+  string trace_id = 1;
+  string span_id = 2;
+
+  /* enum Type { */
+  /*   TYPE_UNSPECIFIED = 0; */
+  /*   // The linked span is a child of the current span. */
+  /*   APPLICATION_LOAD = 1; */
+  /*   // The linked span is a parent of the current span. */
+  /*   NAVIGATION = 2; */
+  /*   // This represents a */
+  /*   CAPTIVE = 3; */
+  /* } */
+  /* Type type = 3; */
+
+  /* double start_time = 4; */
+
+  /* double end_time = 5; */
+
+  // Window performance data ....
+  // struct?
+  // map<string, string>
+
+  // Time
+  // Duration
+  // Browser timing data
+
+  // TODO: Parent/child links to enable relationships between a UiAction and
+  // other UiActions (such as a button click as a child of page navigation).
+}
