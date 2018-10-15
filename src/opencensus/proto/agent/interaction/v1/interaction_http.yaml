@@ -6,9 +6,6 @@ config_version: 3
 
 http:
  rules:
- - selector: opencensus.proto.agent.interaction.Export.ExportSpan
-   post: /v1/export/spans
-   body: "*"
- - selector: opencensus.proto.exporter.Export.ExportMetrics
-   post: /v1/export/metrics
+ - selector: opencensus.proto.agent.interaction.v1.InteractionService.Export
+   post: /v1/interactions/export
    body: "*"

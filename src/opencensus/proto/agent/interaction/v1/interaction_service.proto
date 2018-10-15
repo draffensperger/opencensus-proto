@@ -33,7 +33,6 @@ message ExportInteractionsRequest {
 
 message ExportInteractionsResponse {}
 
-service Export {
-  rpc ExportInteractions(ExportInteractionsRequest)
-      returns (ExportInteractionsResponse) {}
+service InteractionService {
+  rpc Export(ExportInteractionsRequest) returns (ExportInteractionsResponse) {}
 }
