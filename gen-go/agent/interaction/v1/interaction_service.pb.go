@@ -6,7 +6,7 @@ package v1 // import "github.com/census-instrumentation/opencensus-proto/gen-go/
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import interactionproto "github.com/draffensperger/opencensus-web/gen-go/interactionproto"
+import v1 "github.com/draffensperger/opencensus-web/gen-go/interaction/v1"
 
 import (
 	context "golang.org/x/net/context"
@@ -25,10 +25,10 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type ExportInteractionsRequest struct {
-	Interactions         []*interactionproto.Interaction `protobuf:"bytes,1,rep,name=interactions,proto3" json:"interactions,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                        `json:"-"`
-	XXX_unrecognized     []byte                          `json:"-"`
-	XXX_sizecache        int32                           `json:"-"`
+	Interactions         []*v1.Interaction `protobuf:"bytes,1,rep,name=interactions,proto3" json:"interactions,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
 }
 
 func (m *ExportInteractionsRequest) Reset()         { *m = ExportInteractionsRequest{} }
@@ -55,7 +55,7 @@ func (m *ExportInteractionsRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ExportInteractionsRequest proto.InternalMessageInfo
 
-func (m *ExportInteractionsRequest) GetInteractions() []*interactionproto.Interaction {
+func (m *ExportInteractionsRequest) GetInteractions() []*v1.Interaction {
 	if m != nil {
 		return m.Interactions
 	}
