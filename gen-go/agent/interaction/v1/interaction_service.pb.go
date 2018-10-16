@@ -6,7 +6,7 @@ package v1 // import "github.com/census-instrumentation/opencensus-proto/gen-go/
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import v1 "github.com/draffensperger/opencensus-web/gen-go/interaction/v1"
+import v1 "github.com/census-instrumentation/opencensus-proto/gen-go/interaction/v1"
 
 import (
 	context "golang.org/x/net/context"

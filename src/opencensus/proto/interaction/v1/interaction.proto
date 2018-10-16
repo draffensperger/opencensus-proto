@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package opencensus.proto.interaction.v1;
 
-option go_package = "github.com/draffensperger/opencensus-web/gen-go/interaction/v1";
+option go_package = "github.com/census-instrumentation/opencensus-proto/gen-go/interaction/v1";
 
 option java_multiple_files = true;
 option java_package = "io.opencensus.proto.interaction";
@@ -59,7 +59,6 @@ message Interaction {
 
   // TODO: Parent/child links to enable relationships between a UiAction and
   // other UiActions (such as a button click as a child of page navigation).
-
   message WebPerformanceEntry {
     map<string, string> attributes = 1;
   }

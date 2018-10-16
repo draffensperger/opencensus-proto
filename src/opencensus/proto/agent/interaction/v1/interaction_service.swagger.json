@@ -52,7 +52,8 @@
             "type": "string"
           }
         }
-      }
+      },
+      "description": "TODO: Parent/child links to enable relationships between a UiAction and\nother UiActions (such as a button click as a child of page navigation)."
     },
     "v1ExportInteractionsRequest": {
       "type": "object",
