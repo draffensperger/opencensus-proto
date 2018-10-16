@@ -1,0 +1,73 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "github.com/census-instrumentation/opencensus-proto/src/opencensus/proto/agent/interaction/v1/interaction_service.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/interactions/export": {
+      "post": {
+        "operationId": "Export",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v1ExportInteractionsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ExportInteractionsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "InteractionService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "v1ExportInteractionsRequest": {
+      "type": "object",
+      "properties": {
+        "interactions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Interaction"
+          }
+        }
+      }
+    },
+    "v1ExportInteractionsResponse": {
+      "type": "object"
+    },
+    "v1Interaction": {
+      "type": "object",
+      "properties": {
+        "trace_id": {
+          "type": "string"
+        },
+        "span_id": {
+          "type": "string"
+        }
+      },
+      "description": "A UI interation represents a measurable user interaction in a user interface\nclient (usually a web browser or mobile app). UI actions will be transformed\ninto spans and metrics by specialized interceptors in the OpenCensus agent.\n\nClients will typically communicate with the agent over the open internet,\nand for web clients, the communication with be over HTTP. For web clients\nparticularly, it's also important that the amount of client code be small.\nThese considerations impact how the fields in this proto are specified."
+    }
+  }
+}
