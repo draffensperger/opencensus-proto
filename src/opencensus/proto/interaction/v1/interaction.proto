@@ -1,4 +1,5 @@
 // Copyright 2016-18, OpenCensus Authors
+
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +40,8 @@ message Interaction {
 
   // This is the
   double server_request_start = 3;
-  double server_response_start = 4;
+  // Time to response send
+  double server_request_duration = 4;
 
   repeated Span spans = 5;
 
