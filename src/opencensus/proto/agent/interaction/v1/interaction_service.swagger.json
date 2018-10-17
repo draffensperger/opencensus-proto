@@ -43,17 +43,47 @@
     }
   },
   "definitions": {
-    "InteractionWebPerformanceEntry": {
+    "LibraryInfoLanguage": {
+      "type": "string",
+      "enum": [
+        "JAVASCRIPT"
+      ],
+      "default": "JAVASCRIPT"
+    },
+    "LinkType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "CHILD_LINKED_SPAN",
+        "PARENT_LINKED_SPAN"
+      ],
+      "default": "UNSPECIFIED",
+      "description": "The relationship of the current span relative to the linked span: child,\nparent, or unspecified.\n\n - UNSPECIFIED: The relationship of the two spans is unknown, or known but other\nthan parent-child.\n - CHILD_LINKED_SPAN: The linked span is a child of the current span.\n - PARENT_LINKED_SPAN: The linked span is a parent of the current span."
+    },
+    "SpanSpanKind": {
+      "type": "string",
+      "enum": [
+        "SPAN_KIND_UNSPECIFIED",
+        "SERVER",
+        "CLIENT"
+      ],
+      "default": "SPAN_KIND_UNSPECIFIED",
+      "description": "Type of span. Can be used to specify additional relationships between spans\nin addition to a parent/child relationship.\n\n - SPAN_KIND_UNSPECIFIED: Unspecified.\n - SERVER: Indicates that the span covers server-side handling of an RPC or other\nremote network request.\n - CLIENT: Indicates that the span covers the client-side wrapper around an RPC or\nother remote request.\nThese will be joined with browser performance data."
+    },
+    "v1Annotation": {
       "type": "object",
       "properties": {
+        "time": {
+          "type": "number",
+          "format": "double"
+        },
         "attributes": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         }
-      },
-      "description": "TODO: Parent/child links to enable relationships between a UiAction and\nother UiActions (such as a button click as a child of page navigation)."
+      }
     },
     "v1ExportInteractionsRequest": {
       "type": "object",
@@ -73,19 +103,352 @@
       "type": "object",
       "properties": {
         "trace_id": {
+          "type": "string",
+          "description": "The trace ID for the user interaction. All spans within an interaction are\npart of the same trace. The ID is a 16-byte array encoded in hexadecimal."
+        },
+        "time_origin": {
+          "type": "number",
+          "format": "double",
+          "title": "The time origin of the performance clock in the browser session that\ncollected this interaction, measured as milliseconds since the epoch.\nSee https://www.w3.org/TR/hr-time/"
+        },
+        "server_request_start": {
+          "type": "number",
+          "format": "double",
+          "title": "This is the"
+        },
+        "server_response_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "spans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Span"
+          }
+        },
+        "performance_entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1PerformanceEntry"
+          },
+          "title": "Joining spans and performance entries is done in the following way:\n- Initial navigation looks for or creates a \"Nav.\" span\n- XMLHttpRequest looks for or creates \"Xhr.\" spans"
+        },
+        "library_info": {
+          "$ref": "#/definitions/v1LibraryInfo"
+        },
+        "service_info": {
+          "$ref": "#/definitions/v1ServiceInfo"
+        },
+        "client_attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "A measurable user interaction within a web browser client. This could be an\ninitial page load, a route transition within a single page application, or an\non-page user interaction such as clicking a button."
+    },
+    "v1LibraryInfo": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "$ref": "#/definitions/LibraryInfoLanguage"
+        },
+        "library_version": {
+          "type": "string"
+        },
+        "exporter_version": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Link": {
+      "type": "object",
+      "properties": {
+        "trace_id": {
           "type": "string"
         },
         "span_id": {
           "type": "string"
         },
-        "web_performance_entries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/InteractionWebPerformanceEntry"
+        "type": {
+          "$ref": "#/definitions/LinkType"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
           }
         }
+      }
+    },
+    "v1MessageEvent": {
+      "type": "object",
+      "properties": {
+        "time": {
+          "type": "number",
+          "format": "double"
+        },
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "uncompressed_size": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "compressed_size": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1PerformanceEntry": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "initiator_type": {
+          "type": "string"
+        },
+        "next_hop_protocol": {
+          "type": "string"
+        },
+        "entry_type": {
+          "type": "string"
+        },
+        "secure_connection_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "transfer_size": {
+          "type": "number",
+          "format": "double"
+        },
+        "encoded_body_size": {
+          "type": "number",
+          "format": "double"
+        },
+        "decoded_body_size": {
+          "type": "number",
+          "format": "double"
+        },
+        "start_time": {
+          "type": "number",
+          "format": "double"
+        },
+        "duration": {
+          "type": "number",
+          "format": "double"
+        },
+        "connect_end": {
+          "type": "number",
+          "format": "double"
+        },
+        "connect_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "dom_complete": {
+          "type": "number",
+          "format": "double"
+        },
+        "dom_content_loaded_event_end": {
+          "type": "number",
+          "format": "double"
+        },
+        "dom_content_loaded_event_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "dom_interactive": {
+          "type": "number",
+          "format": "double"
+        },
+        "dom_loading": {
+          "type": "number",
+          "format": "double"
+        },
+        "domain_lookup_end": {
+          "type": "number",
+          "format": "double"
+        },
+        "domain_lookup_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "fetch_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "load_event_end": {
+          "type": "number",
+          "format": "double"
+        },
+        "load_event_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "navigation_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "redirect_count": {
+          "type": "number",
+          "format": "double"
+        },
+        "redirect_end": {
+          "type": "number",
+          "format": "double"
+        },
+        "redirect_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "request_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "response_end": {
+          "type": "number",
+          "format": "double"
+        },
+        "response_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "type": {
+          "type": "string"
+        },
+        "unload_event_end": {
+          "type": "number",
+          "format": "double"
+        },
+        "unload_event_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "worker_start": {
+          "type": "number",
+          "format": "double"
+        },
+        "server_timing": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1PerformanceServerTiming"
+          }
+        }
+      }
+    },
+    "v1PerformanceServerTiming": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "v1ServiceInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Span": {
+      "type": "object",
+      "properties": {
+        "span_id": {
+          "type": "string"
+        },
+        "tracestate": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "parent_span_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/definitions/SpanSpanKind"
+        },
+        "start": {
+          "type": "number",
+          "format": "double"
+        },
+        "end": {
+          "type": "number",
+          "format": "double"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "stack_trace": {
+          "type": "string"
+        },
+        "annotations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Annotation"
+          }
+        },
+        "message_events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1MessageEvent"
+          }
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Link"
+          }
+        },
+        "status": {
+          "$ref": "#/definitions/v1Status"
+        },
+        "same_process_as_parent_span": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "A highly recommended but not required flag that identifies when a trace\ncrosses a process boundary. True when the parent_span belongs to the\nsame process as the current span.\nThis will typically be defaulted to true by the web interceptor."
+        },
+        "child_span_count": {
+          "type": "integer",
+          "format": "int64",
+          "description": "An optional number of child spans that were generated while this span\nwas active. If set, allows an implementation to detect missing child spans.\nThis will typically be computed automatically by the interceptor."
+        }
+      }
+    },
+    "v1Status": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The status code."
+        },
+        "message": {
+          "type": "string",
+          "description": "A developer-facing error message, which should be in English."
+        }
       },
-      "description": "A UI interation represents a measurable user interaction in a user interface\nclient (usually a web browser or mobile app). UI actions will be transformed\ninto spans and metrics by specialized interceptors in the OpenCensus agent.\n\nClients will typically communicate with the agent over the open internet,\nand for web clients, the communication with be over HTTP. For web clients\nparticularly, it's also important that the amount of client code be small.\nThese considerations impact how the fields in this proto are specified."
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. This\nproto's fields are a subset of those of\n[google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto),\nwhich is used by [gRPC](https://github.com/grpc)."
     }
   }
 }
