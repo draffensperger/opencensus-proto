@@ -18,7 +18,7 @@ package opencensus.proto.interaction.v1;
 
 import "google/protobuf/wrappers.proto";
 
-option go_package = "github.com/census-instrumentation/opencensus-protop/gen-go/interaction/v1";
+option go_package = "github.com/census-instrumentation/opencensus-proto/gen-go/interaction/v1";
 
 option java_multiple_files = true;
 option java_package = "io.opencensus.proto.interaction";
