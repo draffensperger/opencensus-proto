@@ -19,6 +19,9 @@ load("@org_pubref_rules_protobuf//go:rules.bzl", "go_proto_library")
 proto_library(
     name = "interaction_proto",
     srcs = ["interaction.proto"],
+    deps = [
+        "@com_google_protobuf//:wrappers_proto",
+    ],
 )
 
 cc_proto_library(
@@ -34,8 +37,17 @@ java_proto_library(
 go_proto_library(
     name = "interaction_proto_go",
     protos = ["interaction.proto"],
+    imports = [
+        "external/com_google_protobuf/src",
+    ],
+    inputs = [
+        "@com_google_protobuf//:well_known_protos",
+    ],
     pb_options = [
        # omit the go_package declared in proto files to make bazel works as expect
        "paths=source_relative",
+    ],
+    deps = [
+        "@com_github_golang_protobuf//ptypes/wrappers:go_default_library",
     ],
 )
