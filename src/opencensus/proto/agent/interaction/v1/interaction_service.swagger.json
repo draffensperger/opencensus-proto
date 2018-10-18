@@ -43,167 +43,21 @@
     }
   },
   "definitions": {
-    "LibraryInfoLanguage": {
-      "type": "string",
-      "enum": [
-        "JAVASCRIPT"
-      ],
-      "default": "JAVASCRIPT"
-    },
-    "LinkType": {
-      "type": "string",
-      "enum": [
-        "UNSPECIFIED",
-        "CHILD_LINKED_SPAN",
-        "PARENT_LINKED_SPAN"
-      ],
-      "default": "UNSPECIFIED",
-      "description": "The relationship of the current span relative to the linked span: child,\nparent, or unspecified.\n\n - UNSPECIFIED: The relationship of the two spans is unknown, or known but other\nthan parent-child.\n - CHILD_LINKED_SPAN: The linked span is a child of the current span.\n - PARENT_LINKED_SPAN: The linked span is a parent of the current span."
-    },
-    "SpanSpanKind": {
-      "type": "string",
-      "enum": [
-        "SPAN_KIND_UNSPECIFIED",
-        "SERVER",
-        "CLIENT"
-      ],
-      "default": "SPAN_KIND_UNSPECIFIED",
-      "description": "Type of span. Can be used to specify additional relationships between spans\nin addition to a parent/child relationship.\n\n - SPAN_KIND_UNSPECIFIED: Unspecified.\n - SERVER: Indicates that the span covers server-side handling of an RPC or other\nremote network request.\n - CLIENT: Indicates that the span covers the client-side wrapper around an RPC or\nother remote request.\nThese will be joined with browser performance data."
-    },
-    "v1Annotation": {
+    "InteractionLibraryInfo": {
       "type": "object",
       "properties": {
-        "time": {
-          "type": "number",
-          "format": "double"
-        },
-        "attributes": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "v1ExportInteractionsRequest": {
-      "type": "object",
-      "properties": {
-        "interactions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1Interaction"
-          }
-        }
-      }
-    },
-    "v1ExportInteractionsResponse": {
-      "type": "object"
-    },
-    "v1Interaction": {
-      "type": "object",
-      "properties": {
-        "trace_id": {
-          "type": "string",
-          "description": "The trace ID for the user interaction. All spans within an interaction are\npart of the same trace. The ID is a 16-byte array encoded in hexadecimal."
-        },
-        "time_origin": {
-          "type": "number",
-          "format": "double",
-          "title": "The time origin of the performance clock in the browser session that\ncollected this interaction, measured as milliseconds since the epoch.\nSee https://www.w3.org/TR/hr-time/"
-        },
-        "server_request_start": {
-          "type": "number",
-          "format": "double",
-          "title": "This is the"
-        },
-        "server_response_start": {
-          "type": "number",
-          "format": "double"
-        },
-        "spans": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1Span"
-          }
-        },
-        "performance_entries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1PerformanceEntry"
-          },
-          "title": "Joining spans and performance entries is done in the following way:\n- Initial navigation looks for or creates a \"Nav.\" span\n- XMLHttpRequest looks for or creates \"Xhr.\" spans"
-        },
-        "library_info": {
-          "$ref": "#/definitions/v1LibraryInfo"
-        },
-        "service_info": {
-          "$ref": "#/definitions/v1ServiceInfo"
-        },
-        "client_attributes": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      },
-      "description": "A measurable user interaction within a web browser client. This could be an\ninitial page load, a route transition within a single page application, or an\non-page user interaction such as clicking a button."
-    },
-    "v1LibraryInfo": {
-      "type": "object",
-      "properties": {
-        "language": {
-          "$ref": "#/definitions/LibraryInfoLanguage"
-        },
         "library_version": {
-          "type": "string"
+          "type": "string",
+          "description": "The version of the OpenCensus web client library."
         },
         "exporter_version": {
-          "type": "string"
-        }
-      }
-    },
-    "v1Link": {
-      "type": "object",
-      "properties": {
-        "trace_id": {
-          "type": "string"
-        },
-        "span_id": {
-          "type": "string"
-        },
-        "type": {
-          "$ref": "#/definitions/LinkType"
-        },
-        "attributes": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "v1MessageEvent": {
-      "type": "object",
-      "properties": {
-        "time": {
-          "type": "number",
-          "format": "double"
-        },
-        "id": {
           "type": "string",
-          "format": "uint64"
-        },
-        "uncompressed_size": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "compressed_size": {
-          "type": "string",
-          "format": "uint64"
+          "description": "The version of the OpenCensus web Agent exporter library. If omitted,\nthis is assumed to be the same as `library_version`."
         }
-      }
+      },
+      "title": "Information about the OpenCensus web library that measured the interaction.\nThis is a simplified version of the LibraryInfo message used to write\nserver side Spans. There is no `Language` field currently as we assume the\nlanguage writing web interaction data is browser JavaScript. See\nhttps://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/agent/common/v1/common.proto"
     },
-    "v1PerformanceEntry": {
+    "InteractionPerformanceEntry": {
       "type": "object",
       "properties": {
         "name": {
@@ -336,35 +190,23 @@
         "server_timing": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1PerformanceServerTiming"
+            "$ref": "#/definitions/PerformanceEntryPerformanceServerTiming"
           }
         }
-      }
+      },
+      "title": "Performance data from `performance.getEntries()` retrieved after this\ninteraction ended. Sending the raw performance entries allows the\nJavaScript client code sending the measurements code to be lighter weight.\nThe agent can then use these entries to generate spans with accurate\nnetwork times, annotations and messages events.\nSee https://www.w3.org/TR/performance-timeline/"
     },
-    "v1PerformanceServerTiming": {
+    "InteractionServiceInfo": {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "duration": {
-          "type": "number",
-          "format": "double"
+          "type": "string",
+          "description": "Name of the service."
         }
-      }
+      },
+      "description": "Service description for the web UI that generated the interaction."
     },
-    "v1ServiceInfo": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "v1Span": {
+    "InteractionWebSpan": {
       "type": "object",
       "properties": {
         "span_id": {
@@ -383,7 +225,7 @@
           "type": "string"
         },
         "kind": {
-          "$ref": "#/definitions/SpanSpanKind"
+          "$ref": "#/definitions/WebSpanSpanKind"
         },
         "start": {
           "type": "number",
@@ -405,23 +247,23 @@
         "annotations": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Annotation"
+            "$ref": "#/definitions/WebSpanAnnotation"
           }
         },
         "message_events": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1MessageEvent"
+            "$ref": "#/definitions/WebSpanMessageEvent"
           }
         },
         "links": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Link"
+            "$ref": "#/definitions/WebSpanLink"
           }
         },
         "status": {
-          "$ref": "#/definitions/v1Status"
+          "$ref": "#/definitions/WebSpanStatus"
         },
         "same_process_as_parent_span": {
           "type": "boolean",
@@ -431,24 +273,182 @@
         "child_span_count": {
           "type": "integer",
           "format": "int64",
-          "description": "An optional number of child spans that were generated while this span\nwas active. If set, allows an implementation to detect missing child spans.\nThis will typically be computed automatically by the interceptor."
+          "description": "An optional number of child spans that were generated while this span\nwas active. If set, allows an implementation to detect missing child\nspans. This will typically be computed automatically by the interceptor."
+        }
+      },
+      "title": "A WebSpan is similar to main OpenCensus Span, but is designed to be easier\nfor browser JavaScript to write via HTTP through grpc-gateway. All spans\nfor an interaction are assumed to have the same trace ID, specified above\n(otherwise send two interactions with links).\nSee\nhttps://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/trace/v1/trace.proto"
+    },
+    "LinkType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "CHILD_LINKED_SPAN",
+        "PARENT_LINKED_SPAN"
+      ],
+      "default": "UNSPECIFIED",
+      "description": "The relationship of the current span relative to the linked span:\nchild, parent, or unspecified.\n\n - UNSPECIFIED: The relationship of the two spans is unknown, or known but other\nthan parent-child.\n - CHILD_LINKED_SPAN: The linked span is a child of the current span.\n - PARENT_LINKED_SPAN: The linked span is a parent of the current span."
+    },
+    "PerformanceEntryPerformanceServerTiming": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "number",
+          "format": "double"
         }
       }
     },
-    "v1Status": {
+    "WebSpanAnnotation": {
+      "type": "object",
+      "properties": {
+        "time": {
+          "type": "number",
+          "format": "double"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "WebSpanLink": {
+      "type": "object",
+      "properties": {
+        "trace_id": {
+          "type": "string"
+        },
+        "span_id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/LinkType"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "WebSpanMessageEvent": {
+      "type": "object",
+      "properties": {
+        "time": {
+          "type": "number",
+          "format": "double"
+        },
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "uncompressed_size": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "compressed_size": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "WebSpanSpanKind": {
+      "type": "string",
+      "enum": [
+        "SPAN_KIND_UNSPECIFIED",
+        "SERVER",
+        "CLIENT"
+      ],
+      "default": "SPAN_KIND_UNSPECIFIED",
+      "description": "Type of span. Can be used to specify additional relationships between\nspans in addition to a parent/child relationship.\n\n - SPAN_KIND_UNSPECIFIED: Unspecified.\n - SERVER: Indicates that the span covers server-side handling of an RPC or other\nremote network request.\n - CLIENT: Indicates that the span covers the client-side wrapper around an RPC or\nother remote request.\nThese will be joined with browser performance data."
+    },
+    "WebSpanStatus": {
       "type": "object",
       "properties": {
         "code": {
           "type": "integer",
           "format": "int32",
-          "description": "The status code."
+          "description": "The HTTP status code associated with the."
         },
         "message": {
           "type": "string",
           "description": "A developer-facing error message, which should be in English."
         }
       },
-      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. This\nproto's fields are a subset of those of\n[google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto),\nwhich is used by [gRPC](https://github.com/grpc)."
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs.\nThis proto's fields are a subset of those of\n[google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto),\nwhich is used by [gRPC](https://github.com/grpc)."
+    },
+    "v1ExportInteractionsRequest": {
+      "type": "object",
+      "properties": {
+        "interactions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Interaction"
+          }
+        }
+      }
+    },
+    "v1ExportInteractionsResponse": {
+      "type": "object"
+    },
+    "v1Interaction": {
+      "type": "object",
+      "properties": {
+        "trace_id": {
+          "type": "string",
+          "description": "The trace ID for the user interaction. All spans within an interaction are\npart of the same trace. The ID is a 16-byte array encoded in hexadecimal."
+        },
+        "time_origin": {
+          "type": "number",
+          "format": "double",
+          "title": "The time origin of the performance clock in the browser session that\ncollected this interaction, measured as milliseconds since the epoch.\nSee https://www.w3.org/TR/hr-time/"
+        },
+        "server_navigation_start": {
+          "type": "number",
+          "format": "double",
+          "description": "The time in milliseconds since the epoch that the frontend web server\nreceived the request to render the initial template for the web UI. This\ntime is measured by the server's clock and is used to adjust for clock skew\nbetween the client and server. This should be sent from the web server to\nclient as a value in a \u003cscript\u003e tag in the rendered HTML. A value of 0\nindicates that it is missing."
+        },
+        "server_navigation_duration": {
+          "type": "number",
+          "format": "double",
+          "description": "The time in milliseconds between when the frontend web server received the\nrequest to render the web UI template until it began sending its response.\nThis is measured by the server clock and is used to adjust for clock skew\nbetween client and server. This should also be sent from server to client\nvia the rendered HTML, and a value of 0 indicates that it is missing."
+        },
+        "performance_entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InteractionPerformanceEntry"
+          }
+        },
+        "spans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InteractionWebSpan"
+          }
+        },
+        "library_info": {
+          "$ref": "#/definitions/InteractionLibraryInfo",
+          "description": "OpenCensus web library info."
+        },
+        "service_info": {
+          "$ref": "#/definitions/InteractionServiceInfo",
+          "description": "Service description for the web UI."
+        },
+        "client_attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Attributes associated with web client that generated the interaction. This\ncould be related to the end user (e.g. user ID, session ID) or could be\nrelated to the web UI service (e.g. serving region, environment type).\nThis plays a similar role to the Node `attributes` field.\nSee\nhttps://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/agent/common/v1/common.proto"
+        }
+      },
+      "description": "A measurable user interaction within a web browser client. This could be an\ninitial page load, a route transition within a single page application, or an\non-page user interaction such as clicking a button. This proto contains all\nthe information needed for the web interaction interceptor to generate spans\nand metrics related to the interaction."
     }
   }
 }

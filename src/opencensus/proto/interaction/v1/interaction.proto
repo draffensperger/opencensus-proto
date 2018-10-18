@@ -27,7 +27,9 @@ option java_outer_classname = "InteractionProto";
 
 // A measurable user interaction within a web browser client. This could be an
 // initial page load, a route transition within a single page application, or an
-// on-page user interaction such as clicking a button.
+// on-page user interaction such as clicking a button. This proto contains all
+// the information needed for the web interaction interceptor to generate spans
+// and metrics related to the interaction.
 message Interaction {
   // The trace ID for the user interaction. All spans within an interaction are
   // part of the same trace. The ID is a 16-byte array encoded in hexadecimal.
@@ -38,166 +40,201 @@ message Interaction {
   // See https://www.w3.org/TR/hr-time/
   double time_origin = 2;
 
-  // This is the
-  double server_request_start = 3;
-  // Time to response send
-  double server_request_duration = 4;
+  // The time in milliseconds since the epoch that the frontend web server
+  // received the request to render the initial template for the web UI. This
+  // time is measured by the server's clock and is used to adjust for clock skew
+  // between the client and server. This should be sent from the web server to
+  // client as a value in a <script> tag in the rendered HTML. A value of 0
+  // indicates that it is missing.
+  double server_navigation_start = 3;
 
-  repeated Span spans = 5;
+  // The time in milliseconds between when the frontend web server received the
+  // request to render the web UI template until it began sending its response.
+  // This is measured by the server clock and is used to adjust for clock skew
+  // between client and server. This should also be sent from server to client
+  // via the rendered HTML, and a value of 0 indicates that it is missing.
+  double server_navigation_duration = 4;
 
-  // Joining spans and performance entries is done in the following way:
-  // - Initial navigation looks for or creates a "Nav." span
-  // - XMLHttpRequest looks for or creates "Xhr." spans
-  repeated PerformanceEntry performance_entries = 6;
+  // Performance data from `performance.getEntries()` retrieved after this
+  // interaction ended. Sending the raw performance entries allows the
+  // JavaScript client code sending the measurements code to be lighter weight.
+  // The agent can then use these entries to generate spans with accurate
+  // network times, annotations and messages events.
+  // See https://www.w3.org/TR/performance-timeline/
+  message PerformanceEntry {
+    string name = 1;
+    string initiator_type = 2;
+    string next_hop_protocol = 3;
+    string entry_type = 4;
+    double secure_connection_start = 5;
+    double transfer_size = 6;
+    double encoded_body_size = 7;
+    double decoded_body_size = 8;
+    double start_time = 9;
+    double duration = 10;
+    double connect_end = 11;
+    double connect_start = 12;
+    double dom_complete = 13;
+    double dom_content_loaded_event_end = 14;
+    double dom_content_loaded_event_start = 15;
+    double dom_interactive = 16;
+    double dom_loading = 17;
+    double domain_lookup_end = 18;
+    double domain_lookup_start = 19;
+    double fetch_start = 20;
+    double load_event_end = 21;
+    double load_event_start = 22;
+    double navigation_start = 23;
+    double redirect_count = 24;
+    double redirect_end = 25;
+    double redirect_start = 26;
+    double request_start = 27;
+    double response_end = 28;
+    double response_start = 29;
+    string type = 30;
+    double unload_event_end = 31;
+    double unload_event_start = 32;
+    double worker_start = 33;
 
+    message PerformanceServerTiming {
+      string name = 1;
+      string description = 2;
+      double duration = 3;
+    }
+    repeated PerformanceServerTiming server_timing = 34;
+  }
+
+  repeated PerformanceEntry performance_entries = 5;
+
+  // A WebSpan is similar to main OpenCensus Span, but is designed to be easier
+  // for browser JavaScript to write via HTTP through grpc-gateway. All spans
+  // for an interaction are assumed to have the same trace ID, specified above
+  // (otherwise send two interactions with links).
+  // See
+  // https://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/trace/v1/trace.proto
+  message WebSpan {
+    string span_id = 1;
+    map<string, string> tracestate = 2;
+    string parent_span_id = 3;
+    string name = 4;
+
+    // Type of span. Can be used to specify additional relationships between
+    // spans in addition to a parent/child relationship.
+    enum SpanKind {
+      // Unspecified.
+      SPAN_KIND_UNSPECIFIED = 0;
+
+      // Indicates that the span covers server-side handling of an RPC or other
+      // remote network request.
+      SERVER = 1;
+
+      // Indicates that the span covers the client-side wrapper around an RPC or
+      // other remote request.
+      // These will be joined with browser performance data.
+      CLIENT = 2;
+    }
+    SpanKind kind = 5;
+
+    double start = 6;
+    double end = 7;
+    map<string, string> attributes = 8;
+    string stack_trace = 9;
+
+    message Annotation {
+      double time = 1;
+      map<string, string> attributes = 2;
+    }
+
+    repeated Annotation annotations = 10;
+
+    message MessageEvent {
+      double time = 1;
+      uint64 id = 2;
+      uint64 uncompressed_size = 3;
+      uint64 compressed_size = 4;
+    }
+    repeated MessageEvent message_events = 11;
+
+    message Link {
+      string trace_id = 1;
+      string span_id = 2;
+
+      // The relationship of the current span relative to the linked span:
+      // child, parent, or unspecified.
+      enum Type {
+        // The relationship of the two spans is unknown, or known but other
+        // than parent-child.
+        UNSPECIFIED = 0;
+        // The linked span is a child of the current span.
+        CHILD_LINKED_SPAN = 1;
+        // The linked span is a parent of the current span.
+        PARENT_LINKED_SPAN = 2;
+      }
+
+      Type type = 3;
+
+      map<string, string> attributes = 4;
+    }
+    repeated Link links = 12;
+
+    // The `Status` type defines a logical error model that is suitable for
+    // different programming environments, including REST APIs and RPC APIs.
+    // This proto's fields are a subset of those of
+    // [google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto),
+    // which is used by [gRPC](https://github.com/grpc).
+    message Status {
+      // The HTTP status code associated with the.
+      int32 code = 1;
+      // A developer-facing error message, which should be in English.
+      string message = 2;
+    }
+
+    Status status = 13;
+
+    // A highly recommended but not required flag that identifies when a trace
+    // crosses a process boundary. True when the parent_span belongs to the
+    // same process as the current span.
+    // This will typically be defaulted to true by the web interceptor.
+    google.protobuf.BoolValue same_process_as_parent_span = 14;
+
+    // An optional number of child spans that were generated while this span
+    // was active. If set, allows an implementation to detect missing child
+    // spans. This will typically be computed automatically by the interceptor.
+    google.protobuf.UInt32Value child_span_count = 15;
+  }
+  repeated WebSpan spans = 6;
+
+  // Information about the OpenCensus web library that measured the interaction.
+  // This is a simplified version of the LibraryInfo message used to write
+  // server side Spans. There is no `Language` field currently as we assume the
+  // language writing web interaction data is browser JavaScript. See
+  // https://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/agent/common/v1/common.proto
+  message LibraryInfo {
+    // The version of the OpenCensus web client library.
+    string library_version = 2;
+
+    // The version of the OpenCensus web Agent exporter library. If omitted,
+    // this is assumed to be the same as `library_version`.
+    string exporter_version = 3;
+  }
+
+  // OpenCensus web library info.
   LibraryInfo library_info = 7;
+
+  // Service description for the web UI that generated the interaction.
+  message ServiceInfo {
+    // Name of the service.
+    string name = 1;
+  }
+
+  // Service description for the web UI.
   ServiceInfo service_info = 8;
+
+  // Attributes associated with web client that generated the interaction. This
+  // could be related to the end user (e.g. user ID, session ID) or could be
+  // related to the web UI service (e.g. serving region, environment type).
+  // This plays a similar role to the Node `attributes` field.
+  // See
+  // https://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/agent/common/v1/common.proto
   map<string, string> client_attributes = 9;
-}
-
-message LibraryInfo {
-  enum Language { JAVASCRIPT = 0; }
-  Language language = 1;
-
-  string library_version = 2;
-
-  string exporter_version = 3;
-}
-
-message ServiceInfo {
-  string name = 1;
-}
-
-message Span {
-  string span_id = 1;
-  map<string, string> tracestate = 2;
-  string parent_span_id = 3;
-  string name = 4;
-
-  // Type of span. Can be used to specify additional relationships between spans
-  // in addition to a parent/child relationship.
-  enum SpanKind {
-    // Unspecified.
-    SPAN_KIND_UNSPECIFIED = 0;
-
-    // Indicates that the span covers server-side handling of an RPC or other
-    // remote network request.
-    SERVER = 1;
-
-    // Indicates that the span covers the client-side wrapper around an RPC or
-    // other remote request.
-    // These will be joined with browser performance data.
-    CLIENT = 2;
-  }
-  SpanKind kind = 5;
-
-  double start = 6;
-  double end = 7;
-  map<string, string> attributes = 8;
-  string stack_trace = 9;
-  repeated Annotation annotations = 10;
-  repeated MessageEvent message_events = 11;
-  repeated Link links = 12;
-
-  Status status = 13;
-
-  // A highly recommended but not required flag that identifies when a trace
-  // crosses a process boundary. True when the parent_span belongs to the
-  // same process as the current span.
-  // This will typically be defaulted to true by the web interceptor.
-  google.protobuf.BoolValue same_process_as_parent_span = 14;
-
-  // An optional number of child spans that were generated while this span
-  // was active. If set, allows an implementation to detect missing child spans.
-  // This will typically be computed automatically by the interceptor.
-  google.protobuf.UInt32Value child_span_count = 15;
-}
-
-// The `Status` type defines a logical error model that is suitable for
-// different programming environments, including REST APIs and RPC APIs. This
-// proto's fields are a subset of those of
-// [google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto),
-// which is used by [gRPC](https://github.com/grpc).
-message Status {
-  // The status code.
-  int32 code = 1;
-
-  // A developer-facing error message, which should be in English.
-  string message = 2;
-}
-
-message Annotation {
-  double time = 1;
-  map<string, string> attributes = 2;
-}
-
-message MessageEvent {
-  double time = 1;
-  uint64 id = 2;
-  uint64 uncompressed_size = 3;
-  uint64 compressed_size = 4;
-}
-
-message Link {
-  string trace_id = 1;
-  string span_id = 2;
-
-  // The relationship of the current span relative to the linked span: child,
-  // parent, or unspecified.
-  enum Type {
-    // The relationship of the two spans is unknown, or known but other
-    // than parent-child.
-    UNSPECIFIED = 0;
-    // The linked span is a child of the current span.
-    CHILD_LINKED_SPAN = 1;
-    // The linked span is a parent of the current span.
-    PARENT_LINKED_SPAN = 2;
-  }
-
-  Type type = 3;
-
-  map<string, string> attributes = 4;
-}
-
-message PerformanceEntry {
-  string name = 1;
-  string initiator_type = 2;
-  string next_hop_protocol = 3;
-  string entry_type = 4;
-  double secure_connection_start = 5;
-  double transfer_size = 6;
-  double encoded_body_size = 7;
-  double decoded_body_size = 8;
-  double start_time = 9;
-  double duration = 10;
-  double connect_end = 11;
-  double connect_start = 12;
-  double dom_complete = 13;
-  double dom_content_loaded_event_end = 14;
-  double dom_content_loaded_event_start = 15;
-  double dom_interactive = 16;
-  double dom_loading = 17;
-  double domain_lookup_end = 18;
-  double domain_lookup_start = 19;
-  double fetch_start = 20;
-  double load_event_end = 21;
-  double load_event_start = 22;
-  double navigation_start = 23;
-  double redirect_count = 24;
-  double redirect_end = 25;
-  double redirect_start = 26;
-  double request_start = 27;
-  double response_end = 28;
-  double response_start = 29;
-  string type = 30;
-  double unload_event_end = 31;
-  double unload_event_start = 32;
-  double worker_start = 33;
-  repeated PerformanceServerTiming server_timing = 34;
-}
-
-message PerformanceServerTiming {
-  string name = 1;
-  string description = 2;
-  double duration = 3;
 }
