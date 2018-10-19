@@ -6,6 +6,7 @@ package v1 // import "github.com/census-instrumentation/opencensus-proto/gen-go/
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
+import _struct "github.com/golang/protobuf/ptypes/struct"
 import wrappers "github.com/golang/protobuf/ptypes/wrappers"
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -19,95 +20,77 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type LibraryInfo_Language int32
-
-const (
-	LibraryInfo_JAVASCRIPT LibraryInfo_Language = 0
-)
-
-var LibraryInfo_Language_name = map[int32]string{
-	0: "JAVASCRIPT",
-}
-var LibraryInfo_Language_value = map[string]int32{
-	"JAVASCRIPT": 0,
-}
-
-func (x LibraryInfo_Language) String() string {
-	return proto.EnumName(LibraryInfo_Language_name, int32(x))
-}
-func (LibraryInfo_Language) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{1, 0}
-}
-
-// Type of span. Can be used to specify additional relationships between spans
-// in addition to a parent/child relationship.
-type Span_SpanKind int32
+// Type of span. Can be used to specify additional relationships between
+// spans in addition to a parent/child relationship.
+type Interaction_WebSpan_SpanKind int32
 
 const (
 	// Unspecified.
-	Span_SPAN_KIND_UNSPECIFIED Span_SpanKind = 0
+	Interaction_WebSpan_SPAN_KIND_UNSPECIFIED Interaction_WebSpan_SpanKind = 0
 	// Indicates that the span covers server-side handling of an RPC or other
 	// remote network request.
-	Span_SERVER Span_SpanKind = 1
+	Interaction_WebSpan_SERVER Interaction_WebSpan_SpanKind = 1
 	// Indicates that the span covers the client-side wrapper around an RPC or
 	// other remote request.
 	// These will be joined with browser performance data.
-	Span_CLIENT Span_SpanKind = 2
+	Interaction_WebSpan_CLIENT Interaction_WebSpan_SpanKind = 2
 )
 
-var Span_SpanKind_name = map[int32]string{
+var Interaction_WebSpan_SpanKind_name = map[int32]string{
 	0: "SPAN_KIND_UNSPECIFIED",
 	1: "SERVER",
 	2: "CLIENT",
 }
-var Span_SpanKind_value = map[string]int32{
+var Interaction_WebSpan_SpanKind_value = map[string]int32{
 	"SPAN_KIND_UNSPECIFIED": 0,
 	"SERVER":                1,
 	"CLIENT":                2,
 }
 
-func (x Span_SpanKind) String() string {
-	return proto.EnumName(Span_SpanKind_name, int32(x))
+func (x Interaction_WebSpan_SpanKind) String() string {
+	return proto.EnumName(Interaction_WebSpan_SpanKind_name, int32(x))
 }
-func (Span_SpanKind) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{3, 0}
+func (Interaction_WebSpan_SpanKind) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_interaction_6e926e4a72872ffd, []int{0, 1, 0}
 }
 
-// The relationship of the current span relative to the linked span: child,
-// parent, or unspecified.
-type Link_Type int32
+// The relationship of the current span relative to the linked span:
+// child, parent, or unspecified.
+type Interaction_WebSpan_Link_Type int32
 
 const (
 	// The relationship of the two spans is unknown, or known but other
 	// than parent-child.
-	Link_UNSPECIFIED Link_Type = 0
+	Interaction_WebSpan_Link_UNSPECIFIED Interaction_WebSpan_Link_Type = 0
 	// The linked span is a child of the current span.
-	Link_CHILD_LINKED_SPAN Link_Type = 1
+	Interaction_WebSpan_Link_CHILD_LINKED_SPAN Interaction_WebSpan_Link_Type = 1
 	// The linked span is a parent of the current span.
-	Link_PARENT_LINKED_SPAN Link_Type = 2
+	Interaction_WebSpan_Link_PARENT_LINKED_SPAN Interaction_WebSpan_Link_Type = 2
 )
 
-var Link_Type_name = map[int32]string{
+var Interaction_WebSpan_Link_Type_name = map[int32]string{
 	0: "UNSPECIFIED",
 	1: "CHILD_LINKED_SPAN",
 	2: "PARENT_LINKED_SPAN",
 }
-var Link_Type_value = map[string]int32{
+var Interaction_WebSpan_Link_Type_value = map[string]int32{
 	"UNSPECIFIED":        0,
 	"CHILD_LINKED_SPAN":  1,
 	"PARENT_LINKED_SPAN": 2,
 }
 
-func (x Link_Type) String() string {
-	return proto.EnumName(Link_Type_name, int32(x))
+func (x Interaction_WebSpan_Link_Type) String() string {
+	return proto.EnumName(Interaction_WebSpan_Link_Type_name, int32(x))
 }
-func (Link_Type) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{7, 0}
+func (Interaction_WebSpan_Link_Type) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_interaction_6e926e4a72872ffd, []int{0, 1, 3, 0}
 }
 
 // A measurable user interaction within a web browser client. This could be an
 // initial page load, a route transition within a single page application, or an
-// on-page user interaction such as clicking a button.
+// on-page user interaction such as clicking a button. This proto contains all
+// the information needed for the web interaction interceptor to generate spans
+// and metrics related to the interaction.
 type Interaction struct {
 	// The trace ID for the user interaction. All spans within an interaction are
 	// part of the same trace. The ID is a 16-byte array encoded in hexadecimal.
@@ -116,28 +99,43 @@ type Interaction struct {
 	// collected this interaction, measured as milliseconds since the epoch.
 	// See https://www.w3.org/TR/hr-time/
 	TimeOrigin float64 `protobuf:"fixed64,2,opt,name=time_origin,json=timeOrigin,proto3" json:"time_origin,omitempty"`
-	// This is the
-	ServerRequestStart float64 `protobuf:"fixed64,3,opt,name=server_request_start,json=serverRequestStart,proto3" json:"server_request_start,omitempty"`
-	// Time to response send
-	ServerRequestDuration float64 `protobuf:"fixed64,4,opt,name=server_request_duration,json=serverRequestDuration,proto3" json:"server_request_duration,omitempty"`
-	Spans                 []*Span `protobuf:"bytes,5,rep,name=spans,proto3" json:"spans,omitempty"`
-	// Joining spans and performance entries is done in the following way:
-	// - Initial navigation looks for or creates a "Nav." span
-	// - XMLHttpRequest looks for or creates "Xhr." spans
-	PerformanceEntries   []*PerformanceEntry `protobuf:"bytes,6,rep,name=performance_entries,json=performanceEntries,proto3" json:"performance_entries,omitempty"`
-	LibraryInfo          *LibraryInfo        `protobuf:"bytes,7,opt,name=library_info,json=libraryInfo,proto3" json:"library_info,omitempty"`
-	ServiceInfo          *ServiceInfo        `protobuf:"bytes,8,opt,name=service_info,json=serviceInfo,proto3" json:"service_info,omitempty"`
-	ClientAttributes     map[string]string   `protobuf:"bytes,9,rep,name=client_attributes,json=clientAttributes,proto3" json:"client_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_unrecognized     []byte              `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
+	// The time in milliseconds since the epoch that the frontend web server
+	// received the request to render the initial template for the web UI. This
+	// time is measured by the server's clock and is used to adjust for clock skew
+	// between the client and server. This should be sent from the web server to
+	// client as a value in a <script> tag in the rendered HTML. A value of 0
+	// indicates that it is missing.
+	ServerNavigationStart float64 `protobuf:"fixed64,3,opt,name=server_navigation_start,json=serverNavigationStart,proto3" json:"server_navigation_start,omitempty"`
+	// The time in milliseconds between when the frontend web server received the
+	// request to render the web UI template until it began sending its response.
+	// This is measured by the server clock and is used to adjust for clock skew
+	// between client and server. This should also be sent from server to client
+	// via the rendered HTML, and a value of 0 indicates that it is missing.
+	ServerNavigationDuration float64 `protobuf:"fixed64,4,opt,name=server_navigation_duration,json=serverNavigationDuration,proto3" json:"server_navigation_duration,omitempty"`
+	// Web performance entries associated with the interaction.
+	PerformanceEntries []*Interaction_PerformanceEntry `protobuf:"bytes,5,rep,name=performance_entries,json=performanceEntries,proto3" json:"performance_entries,omitempty"`
+	Spans              []*Interaction_WebSpan          `protobuf:"bytes,6,rep,name=spans,proto3" json:"spans,omitempty"`
+	// OpenCensus web library info.
+	LibraryInfo *Interaction_LibraryInfo `protobuf:"bytes,7,opt,name=library_info,json=libraryInfo,proto3" json:"library_info,omitempty"`
+	// Service description for the web UI.
+	ServiceInfo *Interaction_ServiceInfo `protobuf:"bytes,8,opt,name=service_info,json=serviceInfo,proto3" json:"service_info,omitempty"`
+	// Attributes associated with web client that generated the interaction. This
+	// could be related to the end user (e.g. user ID, session ID) or could be
+	// related to the web UI service (e.g. serving region, environment type).
+	// This plays a similar role to the Node `attributes` field.
+	// See
+	// https://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/agent/common/v1/common.proto
+	ClientAttributes     map[string]string `protobuf:"bytes,9,rep,name=client_attributes,json=clientAttributes,proto3" json:"client_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
 }
 
 func (m *Interaction) Reset()         { *m = Interaction{} }
 func (m *Interaction) String() string { return proto.CompactTextString(m) }
 func (*Interaction) ProtoMessage()    {}
 func (*Interaction) Descriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{0}
+	return fileDescriptor_interaction_6e926e4a72872ffd, []int{0}
 }
 func (m *Interaction) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Interaction.Unmarshal(m, b)
@@ -171,42 +169,42 @@ func (m *Interaction) GetTimeOrigin() float64 {
 	return 0
 }
 
-func (m *Interaction) GetServerRequestStart() float64 {
+func (m *Interaction) GetServerNavigationStart() float64 {
 	if m != nil {
-		return m.ServerRequestStart
+		return m.ServerNavigationStart
 	}
 	return 0
 }
 
-func (m *Interaction) GetServerRequestDuration() float64 {
+func (m *Interaction) GetServerNavigationDuration() float64 {
 	if m != nil {
-		return m.ServerRequestDuration
+		return m.ServerNavigationDuration
 	}
 	return 0
 }
 
-func (m *Interaction) GetSpans() []*Span {
-	if m != nil {
-		return m.Spans
-	}
-	return nil
-}
-
-func (m *Interaction) GetPerformanceEntries() []*PerformanceEntry {
+func (m *Interaction) GetPerformanceEntries() []*Interaction_PerformanceEntry {
 	if m != nil {
 		return m.PerformanceEntries
 	}
 	return nil
 }
 
-func (m *Interaction) GetLibraryInfo() *LibraryInfo {
+func (m *Interaction) GetSpans() []*Interaction_WebSpan {
+	if m != nil {
+		return m.Spans
+	}
+	return nil
+}
+
+func (m *Interaction) GetLibraryInfo() *Interaction_LibraryInfo {
 	if m != nil {
 		return m.LibraryInfo
 	}
 	return nil
 }
 
-func (m *Interaction) GetServiceInfo() *ServiceInfo {
+func (m *Interaction) GetServiceInfo() *Interaction_ServiceInfo {
 	if m != nil {
 		return m.ServiceInfo
 	}
@@ -220,355 +218,654 @@ func (m *Interaction) GetClientAttributes() map[string]string {
 	return nil
 }
 
-type LibraryInfo struct {
-	Language             LibraryInfo_Language `protobuf:"varint,1,opt,name=language,proto3,enum=opencensus.proto.interaction.v1.LibraryInfo_Language" json:"language,omitempty"`
-	LibraryVersion       string               `protobuf:"bytes,2,opt,name=library_version,json=libraryVersion,proto3" json:"library_version,omitempty"`
-	ExporterVersion      string               `protobuf:"bytes,3,opt,name=exporter_version,json=exporterVersion,proto3" json:"exporter_version,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
-}
-
-func (m *LibraryInfo) Reset()         { *m = LibraryInfo{} }
-func (m *LibraryInfo) String() string { return proto.CompactTextString(m) }
-func (*LibraryInfo) ProtoMessage()    {}
-func (*LibraryInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{1}
-}
-func (m *LibraryInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_LibraryInfo.Unmarshal(m, b)
-}
-func (m *LibraryInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_LibraryInfo.Marshal(b, m, deterministic)
-}
-func (dst *LibraryInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_LibraryInfo.Merge(dst, src)
-}
-func (m *LibraryInfo) XXX_Size() int {
-	return xxx_messageInfo_LibraryInfo.Size(m)
-}
-func (m *LibraryInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_LibraryInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_LibraryInfo proto.InternalMessageInfo
-
-func (m *LibraryInfo) GetLanguage() LibraryInfo_Language {
-	if m != nil {
-		return m.Language
-	}
-	return LibraryInfo_JAVASCRIPT
-}
-
-func (m *LibraryInfo) GetLibraryVersion() string {
-	if m != nil {
-		return m.LibraryVersion
-	}
-	return ""
-}
-
-func (m *LibraryInfo) GetExporterVersion() string {
-	if m != nil {
-		return m.ExporterVersion
-	}
-	return ""
-}
-
-type ServiceInfo struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+// Performance data from `performance.getEntries()` retrieved after this
+// interaction ended. All timings are in milleconds since the browser
+// navigation start. Values may be zero if the browser security policy
+// does not permit reading the field, e.g. if the resource requested is
+// from another domain and no matching Timing-Allow-Origin header is sent.
+// See detailed specs at:
+// https://www.w3.org/TR/performance-timeline-2/
+// https://www.w3.org/TR/resource-timing-2/
+// https://www.w3.org/TR/navigation-timing-2/
+// https://www.w3.org/TR/server-timing/
+//
+// Sending the raw performance entries allows the JavaScript client code
+// o be smaller. The OpenCensus agent web interceptor can use these entries to
+// generate detailed spans.
+type Interaction_PerformanceEntry struct {
+	// Type of performnce entry e.g. "navigation" or "resource".
+	EntryType string `protobuf:"bytes,1,opt,name=entry_type,json=entryType,proto3" json:"entry_type,omitempty"`
+	// The first timestamp of the entry, e.g. for a resource timing, the time
+	// right before the browser starts the fetch.
+	StartTime float64 `protobuf:"fixed64,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// The duration of the performance entry in milliseconds.
+	Duration float64 `protobuf:"fixed64,3,opt,name=duration,proto3" json:"duration,omitempty"`
+	// URL of the retrieved resource or page.
+	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	// The type of navigation for a navigation entry.
+	Type string `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
+	// The type of resource that initiated the performance event.
+	InitiatorType string `protobuf:"bytes,6,opt,name=initiator_type,json=initiatorType,proto3" json:"initiator_type,omitempty"`
+	// If the document has an active service worker registration, this is
+	// time right before the browser ran the worker or fired the `fetch` event.
+	WorkerStart float64 `protobuf:"fixed64,7,opt,name=worker_start,json=workerStart,proto3" json:"worker_start,omitempty"`
+	// If there are HTTP redirects when navigating and if all are from the same
+	// origin, this is the start time of the fetch that initiated the redirect.
+	RedirectStart float64 `protobuf:"fixed64,8,opt,name=redirect_start,json=redirectStart,proto3" json:"redirect_start,omitempty"`
+	// Number of redirects since the last non-redirect navigation.
+	RedirectCount int32 `protobuf:"varint,9,opt,name=redirect_count,json=redirectCount,proto3" json:"redirect_count,omitempty"`
+	// The time right after receiving the last byte of the last redirect.
+	RedirectEnd float64 `protobuf:"fixed64,10,opt,name=redirect_end,json=redirectEnd,proto3" json:"redirect_end,omitempty"`
+	// Time right before the browser checks caches for a resource.
+	FetchStart float64 `protobuf:"fixed64,11,opt,name=fetch_start,json=fetchStart,proto3" json:"fetch_start,omitempty"`
+	// Time right before the browser starts the domain name lookup.
+	DomainLookupStart float64 `protobuf:"fixed64,12,opt,name=domain_lookup_start,json=domainLookupStart,proto3" json:"domain_lookup_start,omitempty"`
+	// Time right after the browser finishes the domain name lookup.
+	DomainLookupEnd float64 `protobuf:"fixed64,13,opt,name=domain_lookup_end,json=domainLookupEnd,proto3" json:"domain_lookup_end,omitempty"`
+	// Time right before the browser starts establishing the server connection.
+	// If a persistent connection is used or the resource is retrieved from
+	// cache, this will match domain_lookup_end.
+	ConnectStart float64 `protobuf:"fixed64,14,opt,name=connect_start,json=connectStart,proto3" json:"connect_start,omitempty"`
+	// Time right before the browser starts the handshake to secure the
+	// connection, or zero if a secure connection is not used.
+	SecureConnectionStart float64 `protobuf:"fixed64,15,opt,name=secure_connection_start,json=secureConnectionStart,proto3" json:"secure_connection_start,omitempty"`
+	// The time right after the browser finishes establishing the
+	// connection. If a persistent connection is used or the resource is
+	// retrieved from cache, this will match domain_lookup_end.
+	ConnectEnd float64 `protobuf:"fixed64,16,opt,name=connect_end,json=connectEnd,proto3" json:"connect_end,omitempty"`
+	// The network protocol used to fetch the resource, as identified by the
+	// ALPN Protocol ID.
+	NextHopProtocol string `protobuf:"bytes,17,opt,name=next_hop_protocol,json=nextHopProtocol,proto3" json:"next_hop_protocol,omitempty"`
+	// The time right before the browser starts requesting the resource
+	// from the server or cache.
+	RequestStart float64 `protobuf:"fixed64,18,opt,name=request_start,json=requestStart,proto3" json:"request_start,omitempty"`
+	// The time right after the browser's HTTP parser receives the
+	// first byte of the response.
+	ResponseStart float64 `protobuf:"fixed64,19,opt,name=response_start,json=responseStart,proto3" json:"response_start,omitempty"`
+	// The time right after the browser receives the last byte of the
+	// response.
+	ResponseEnd float64 `protobuf:"fixed64,20,opt,name=response_end,json=responseEnd,proto3" json:"response_end,omitempty"`
+	// The number of bytes received from a HTTP-network fetch, consumed by the
+	// response header fields and response payload.
+	TransferSize int64 `protobuf:"varint,21,opt,name=transfer_size,json=transferSize,proto3" json:"transfer_size,omitempty"`
+	// Compressed size of the payload body in bytes.
+	EncodedBodySize int64 `protobuf:"varint,22,opt,name=encoded_body_size,json=encodedBodySize,proto3" json:"encoded_body_size,omitempty"`
+	// Uncompressed size of the payload body in bytes.
+	DecodedBodySize int64 `protobuf:"varint,23,opt,name=decoded_body_size,json=decodedBodySize,proto3" json:"decoded_body_size,omitempty"`
+	// Server timings associated with the performance entry.
+	ServerTiming []*Interaction_PerformanceEntry_PerformanceServerTiming `protobuf:"bytes,24,rep,name=server_timing,json=serverTiming,proto3" json:"server_timing,omitempty"`
+	// If the previous document and the current document have the same same
+	// origin, this attribute must return the time right after the user
+	// agent finishes the unload event of the previous document. If there is no
+	// previous document or the previous document has a different origin than
+	// the current document or the unload is not yet completed, this attribute
+	// must return zero.
+	UnloadEventStart float64 `protobuf:"fixed64,25,opt,name=unload_event_start,json=unloadEventStart,proto3" json:"unload_event_start,omitempty"`
+	// If the previous document and the current document have the same origin
+	// [RFC6454], this attribute must return the time right before the
+	// browser starts the unload event of the previous document. If there is
+	// no previous document or the previous document has a different origin than
+	// the current document, this attribute must return zero.
+	UnloadEventEnd float64 `protobuf:"fixed64,26,opt,name=unload_event_end,json=unloadEventEnd,proto3" json:"unload_event_end,omitempty"`
+	// This attribute must return the time right before the browser
+	// sets the current document readiness to "interactive".
+	DomInteractive float64 `protobuf:"fixed64,27,opt,name=dom_interactive,json=domInteractive,proto3" json:"dom_interactive,omitempty"`
+	// This attribute must return the time right before the browser
+	// fires the DOMContentLoaded event at the Document.
+	DomContentLoadedEventStart float64 `protobuf:"fixed64,28,opt,name=dom_content_loaded_event_start,json=domContentLoadedEventStart,proto3" json:"dom_content_loaded_event_start,omitempty"`
+	// This attribute must return the time right after the document's
+	// DOMContentLoaded event completes.
+	DomContentLoadedEventEnd float64 `protobuf:"fixed64,29,opt,name=dom_content_loaded_event_end,json=domContentLoadedEventEnd,proto3" json:"dom_content_loaded_event_end,omitempty"`
+	// This attribute must return the time right before the browser
+	// sets the current document readiness to "complete".
+	DomComplete float64 `protobuf:"fixed64,30,opt,name=dom_complete,json=domComplete,proto3" json:"dom_complete,omitempty"`
+	// This attribute must return the time right before the load event of
+	// the current document is fired. It must return zero when the load event is
+	// not fired yet.
+	LoadEventEnd float64 `protobuf:"fixed64,31,opt,name=load_event_end,json=loadEventEnd,proto3" json:"load_event_end,omitempty"`
+	// This attribute must return the time when the load event of the current
+	// document is completed. It must return zero when the load event is not
+	// fired or is not completed.
+	LoadEventStart float64 `protobuf:"fixed64,32,opt,name=load_event_start,json=loadEventStart,proto3" json:"load_event_start,omitempty"`
+	// Deprecated in Navigation Timing Level 2 Spec. This attribute must return
+	// the time right before the browser sets the current document
+	// readiness to "loading". Due to differences in when a Document object is
+	// created in existing browsers, the value returned by the domLoading is
+	// implementation specific and should not be used in meaningful metrics.
+	DomLoading           float64  `protobuf:"fixed64,33,opt,name=dom_loading,json=domLoading,proto3" json:"dom_loading,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ServiceInfo) Reset()         { *m = ServiceInfo{} }
-func (m *ServiceInfo) String() string { return proto.CompactTextString(m) }
-func (*ServiceInfo) ProtoMessage()    {}
-func (*ServiceInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{2}
+func (m *Interaction_PerformanceEntry) Reset()         { *m = Interaction_PerformanceEntry{} }
+func (m *Interaction_PerformanceEntry) String() string { return proto.CompactTextString(m) }
+func (*Interaction_PerformanceEntry) ProtoMessage()    {}
+func (*Interaction_PerformanceEntry) Descriptor() ([]byte, []int) {
+	return fileDescriptor_interaction_6e926e4a72872ffd, []int{0, 0}
 }
-func (m *ServiceInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ServiceInfo.Unmarshal(m, b)
+func (m *Interaction_PerformanceEntry) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Interaction_PerformanceEntry.Unmarshal(m, b)
 }
-func (m *ServiceInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ServiceInfo.Marshal(b, m, deterministic)
+func (m *Interaction_PerformanceEntry) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Interaction_PerformanceEntry.Marshal(b, m, deterministic)
 }
-func (dst *ServiceInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ServiceInfo.Merge(dst, src)
+func (dst *Interaction_PerformanceEntry) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Interaction_PerformanceEntry.Merge(dst, src)
 }
-func (m *ServiceInfo) XXX_Size() int {
-	return xxx_messageInfo_ServiceInfo.Size(m)
+func (m *Interaction_PerformanceEntry) XXX_Size() int {
+	return xxx_messageInfo_Interaction_PerformanceEntry.Size(m)
 }
-func (m *ServiceInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_ServiceInfo.DiscardUnknown(m)
+func (m *Interaction_PerformanceEntry) XXX_DiscardUnknown() {
+	xxx_messageInfo_Interaction_PerformanceEntry.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ServiceInfo proto.InternalMessageInfo
+var xxx_messageInfo_Interaction_PerformanceEntry proto.InternalMessageInfo
 
-func (m *ServiceInfo) GetName() string {
+func (m *Interaction_PerformanceEntry) GetEntryType() string {
+	if m != nil {
+		return m.EntryType
+	}
+	return ""
+}
+
+func (m *Interaction_PerformanceEntry) GetStartTime() float64 {
+	if m != nil {
+		return m.StartTime
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetDuration() float64 {
+	if m != nil {
+		return m.Duration
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-type Span struct {
-	SpanId        string            `protobuf:"bytes,1,opt,name=span_id,json=spanId,proto3" json:"span_id,omitempty"`
-	Tracestate    map[string]string `protobuf:"bytes,2,rep,name=tracestate,proto3" json:"tracestate,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	ParentSpanId  string            `protobuf:"bytes,3,opt,name=parent_span_id,json=parentSpanId,proto3" json:"parent_span_id,omitempty"`
-	Name          string            `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Kind          Span_SpanKind     `protobuf:"varint,5,opt,name=kind,proto3,enum=opencensus.proto.interaction.v1.Span_SpanKind" json:"kind,omitempty"`
-	Start         float64           `protobuf:"fixed64,6,opt,name=start,proto3" json:"start,omitempty"`
-	End           float64           `protobuf:"fixed64,7,opt,name=end,proto3" json:"end,omitempty"`
-	Attributes    map[string]string `protobuf:"bytes,8,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	StackTrace    string            `protobuf:"bytes,9,opt,name=stack_trace,json=stackTrace,proto3" json:"stack_trace,omitempty"`
-	Annotations   []*Annotation     `protobuf:"bytes,10,rep,name=annotations,proto3" json:"annotations,omitempty"`
-	MessageEvents []*MessageEvent   `protobuf:"bytes,11,rep,name=message_events,json=messageEvents,proto3" json:"message_events,omitempty"`
-	Links         []*Link           `protobuf:"bytes,12,rep,name=links,proto3" json:"links,omitempty"`
-	Status        *Status           `protobuf:"bytes,13,opt,name=status,proto3" json:"status,omitempty"`
+func (m *Interaction_PerformanceEntry) GetType() string {
+	if m != nil {
+		return m.Type
+	}
+	return ""
+}
+
+func (m *Interaction_PerformanceEntry) GetInitiatorType() string {
+	if m != nil {
+		return m.InitiatorType
+	}
+	return ""
+}
+
+func (m *Interaction_PerformanceEntry) GetWorkerStart() float64 {
+	if m != nil {
+		return m.WorkerStart
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetRedirectStart() float64 {
+	if m != nil {
+		return m.RedirectStart
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetRedirectCount() int32 {
+	if m != nil {
+		return m.RedirectCount
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetRedirectEnd() float64 {
+	if m != nil {
+		return m.RedirectEnd
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetFetchStart() float64 {
+	if m != nil {
+		return m.FetchStart
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetDomainLookupStart() float64 {
+	if m != nil {
+		return m.DomainLookupStart
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetDomainLookupEnd() float64 {
+	if m != nil {
+		return m.DomainLookupEnd
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetConnectStart() float64 {
+	if m != nil {
+		return m.ConnectStart
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetSecureConnectionStart() float64 {
+	if m != nil {
+		return m.SecureConnectionStart
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetConnectEnd() float64 {
+	if m != nil {
+		return m.ConnectEnd
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetNextHopProtocol() string {
+	if m != nil {
+		return m.NextHopProtocol
+	}
+	return ""
+}
+
+func (m *Interaction_PerformanceEntry) GetRequestStart() float64 {
+	if m != nil {
+		return m.RequestStart
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetResponseStart() float64 {
+	if m != nil {
+		return m.ResponseStart
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetResponseEnd() float64 {
+	if m != nil {
+		return m.ResponseEnd
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetTransferSize() int64 {
+	if m != nil {
+		return m.TransferSize
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetEncodedBodySize() int64 {
+	if m != nil {
+		return m.EncodedBodySize
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetDecodedBodySize() int64 {
+	if m != nil {
+		return m.DecodedBodySize
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetServerTiming() []*Interaction_PerformanceEntry_PerformanceServerTiming {
+	if m != nil {
+		return m.ServerTiming
+	}
+	return nil
+}
+
+func (m *Interaction_PerformanceEntry) GetUnloadEventStart() float64 {
+	if m != nil {
+		return m.UnloadEventStart
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetUnloadEventEnd() float64 {
+	if m != nil {
+		return m.UnloadEventEnd
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetDomInteractive() float64 {
+	if m != nil {
+		return m.DomInteractive
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetDomContentLoadedEventStart() float64 {
+	if m != nil {
+		return m.DomContentLoadedEventStart
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetDomContentLoadedEventEnd() float64 {
+	if m != nil {
+		return m.DomContentLoadedEventEnd
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetDomComplete() float64 {
+	if m != nil {
+		return m.DomComplete
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetLoadEventEnd() float64 {
+	if m != nil {
+		return m.LoadEventEnd
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetLoadEventStart() float64 {
+	if m != nil {
+		return m.LoadEventStart
+	}
+	return 0
+}
+
+func (m *Interaction_PerformanceEntry) GetDomLoading() float64 {
+	if m != nil {
+		return m.DomLoading
+	}
+	return 0
+}
+
+// Timing entries sent by the server via the Server-Timing header.
+// See https://www.w3.org/TR/server-timing/
+type Interaction_PerformanceEntry_PerformanceServerTiming struct {
+	// Metric name sent by the server.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Metric description sent by the server.
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// Metric value sent by the server.
+	Duration             float64  `protobuf:"fixed64,3,opt,name=duration,proto3" json:"duration,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Interaction_PerformanceEntry_PerformanceServerTiming) Reset() {
+	*m = Interaction_PerformanceEntry_PerformanceServerTiming{}
+}
+func (m *Interaction_PerformanceEntry_PerformanceServerTiming) String() string {
+	return proto.CompactTextString(m)
+}
+func (*Interaction_PerformanceEntry_PerformanceServerTiming) ProtoMessage() {}
+func (*Interaction_PerformanceEntry_PerformanceServerTiming) Descriptor() ([]byte, []int) {
+	return fileDescriptor_interaction_6e926e4a72872ffd, []int{0, 0, 0}
+}
+func (m *Interaction_PerformanceEntry_PerformanceServerTiming) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Interaction_PerformanceEntry_PerformanceServerTiming.Unmarshal(m, b)
+}
+func (m *Interaction_PerformanceEntry_PerformanceServerTiming) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Interaction_PerformanceEntry_PerformanceServerTiming.Marshal(b, m, deterministic)
+}
+func (dst *Interaction_PerformanceEntry_PerformanceServerTiming) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Interaction_PerformanceEntry_PerformanceServerTiming.Merge(dst, src)
+}
+func (m *Interaction_PerformanceEntry_PerformanceServerTiming) XXX_Size() int {
+	return xxx_messageInfo_Interaction_PerformanceEntry_PerformanceServerTiming.Size(m)
+}
+func (m *Interaction_PerformanceEntry_PerformanceServerTiming) XXX_DiscardUnknown() {
+	xxx_messageInfo_Interaction_PerformanceEntry_PerformanceServerTiming.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Interaction_PerformanceEntry_PerformanceServerTiming proto.InternalMessageInfo
+
+func (m *Interaction_PerformanceEntry_PerformanceServerTiming) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Interaction_PerformanceEntry_PerformanceServerTiming) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *Interaction_PerformanceEntry_PerformanceServerTiming) GetDuration() float64 {
+	if m != nil {
+		return m.Duration
+	}
+	return 0
+}
+
+// A WebSpan is similar to main OpenCensus Span, but is designed to be easier
+// for browser JavaScript to write via HTTP through grpc-gateway. All spans
+// for an interaction are assumed to have the same trace ID, specified above
+// (otherwise send two interactions with links).
+// See
+// https://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/trace/v1/trace.proto
+type Interaction_WebSpan struct {
+	SpanId        string                              `protobuf:"bytes,1,opt,name=span_id,json=spanId,proto3" json:"span_id,omitempty"`
+	Tracestate    map[string]string                   `protobuf:"bytes,2,rep,name=tracestate,proto3" json:"tracestate,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	ParentSpanId  string                              `protobuf:"bytes,3,opt,name=parent_span_id,json=parentSpanId,proto3" json:"parent_span_id,omitempty"`
+	Name          string                              `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Kind          Interaction_WebSpan_SpanKind        `protobuf:"varint,5,opt,name=kind,proto3,enum=opencensus.proto.interaction.v1.Interaction_WebSpan_SpanKind" json:"kind,omitempty"`
+	Start         float64                             `protobuf:"fixed64,6,opt,name=start,proto3" json:"start,omitempty"`
+	End           float64                             `protobuf:"fixed64,7,opt,name=end,proto3" json:"end,omitempty"`
+	Attributes    *_struct.Struct                     `protobuf:"bytes,8,opt,name=attributes,proto3" json:"attributes,omitempty"`
+	StackTrace    string                              `protobuf:"bytes,9,opt,name=stack_trace,json=stackTrace,proto3" json:"stack_trace,omitempty"`
+	Annotations   []*Interaction_WebSpan_Annotation   `protobuf:"bytes,10,rep,name=annotations,proto3" json:"annotations,omitempty"`
+	MessageEvents []*Interaction_WebSpan_MessageEvent `protobuf:"bytes,11,rep,name=message_events,json=messageEvents,proto3" json:"message_events,omitempty"`
+	Links         []*Interaction_WebSpan_Link         `protobuf:"bytes,12,rep,name=links,proto3" json:"links,omitempty"`
+	Status        *Interaction_WebSpan_Status         `protobuf:"bytes,13,opt,name=status,proto3" json:"status,omitempty"`
 	// A highly recommended but not required flag that identifies when a trace
 	// crosses a process boundary. True when the parent_span belongs to the
 	// same process as the current span.
 	// This will typically be defaulted to true by the web interceptor.
 	SameProcessAsParentSpan *wrappers.BoolValue `protobuf:"bytes,14,opt,name=same_process_as_parent_span,json=sameProcessAsParentSpan,proto3" json:"same_process_as_parent_span,omitempty"`
 	// An optional number of child spans that were generated while this span
-	// was active. If set, allows an implementation to detect missing child spans.
-	// This will typically be computed automatically by the interceptor.
+	// was active. If set, allows an implementation to detect missing child
+	// spans. This will typically be computed automatically by the interceptor.
 	ChildSpanCount       *wrappers.UInt32Value `protobuf:"bytes,15,opt,name=child_span_count,json=childSpanCount,proto3" json:"child_span_count,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
 	XXX_unrecognized     []byte                `json:"-"`
 	XXX_sizecache        int32                 `json:"-"`
 }
 
-func (m *Span) Reset()         { *m = Span{} }
-func (m *Span) String() string { return proto.CompactTextString(m) }
-func (*Span) ProtoMessage()    {}
-func (*Span) Descriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{3}
+func (m *Interaction_WebSpan) Reset()         { *m = Interaction_WebSpan{} }
+func (m *Interaction_WebSpan) String() string { return proto.CompactTextString(m) }
+func (*Interaction_WebSpan) ProtoMessage()    {}
+func (*Interaction_WebSpan) Descriptor() ([]byte, []int) {
+	return fileDescriptor_interaction_6e926e4a72872ffd, []int{0, 1}
 }
-func (m *Span) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Span.Unmarshal(m, b)
+func (m *Interaction_WebSpan) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Interaction_WebSpan.Unmarshal(m, b)
 }
-func (m *Span) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Span.Marshal(b, m, deterministic)
+func (m *Interaction_WebSpan) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Interaction_WebSpan.Marshal(b, m, deterministic)
 }
-func (dst *Span) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Span.Merge(dst, src)
+func (dst *Interaction_WebSpan) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Interaction_WebSpan.Merge(dst, src)
 }
-func (m *Span) XXX_Size() int {
-	return xxx_messageInfo_Span.Size(m)
+func (m *Interaction_WebSpan) XXX_Size() int {
+	return xxx_messageInfo_Interaction_WebSpan.Size(m)
 }
-func (m *Span) XXX_DiscardUnknown() {
-	xxx_messageInfo_Span.DiscardUnknown(m)
+func (m *Interaction_WebSpan) XXX_DiscardUnknown() {
+	xxx_messageInfo_Interaction_WebSpan.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Span proto.InternalMessageInfo
+var xxx_messageInfo_Interaction_WebSpan proto.InternalMessageInfo
 
-func (m *Span) GetSpanId() string {
+func (m *Interaction_WebSpan) GetSpanId() string {
 	if m != nil {
 		return m.SpanId
 	}
 	return ""
 }
 
-func (m *Span) GetTracestate() map[string]string {
+func (m *Interaction_WebSpan) GetTracestate() map[string]string {
 	if m != nil {
 		return m.Tracestate
 	}
 	return nil
 }
 
-func (m *Span) GetParentSpanId() string {
+func (m *Interaction_WebSpan) GetParentSpanId() string {
 	if m != nil {
 		return m.ParentSpanId
 	}
 	return ""
 }
 
-func (m *Span) GetName() string {
+func (m *Interaction_WebSpan) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *Span) GetKind() Span_SpanKind {
+func (m *Interaction_WebSpan) GetKind() Interaction_WebSpan_SpanKind {
 	if m != nil {
 		return m.Kind
 	}
-	return Span_SPAN_KIND_UNSPECIFIED
+	return Interaction_WebSpan_SPAN_KIND_UNSPECIFIED
 }
 
-func (m *Span) GetStart() float64 {
+func (m *Interaction_WebSpan) GetStart() float64 {
 	if m != nil {
 		return m.Start
 	}
 	return 0
 }
 
-func (m *Span) GetEnd() float64 {
+func (m *Interaction_WebSpan) GetEnd() float64 {
 	if m != nil {
 		return m.End
 	}
 	return 0
 }
 
-func (m *Span) GetAttributes() map[string]string {
+func (m *Interaction_WebSpan) GetAttributes() *_struct.Struct {
 	if m != nil {
 		return m.Attributes
 	}
 	return nil
 }
 
-func (m *Span) GetStackTrace() string {
+func (m *Interaction_WebSpan) GetStackTrace() string {
 	if m != nil {
 		return m.StackTrace
 	}
 	return ""
 }
 
-func (m *Span) GetAnnotations() []*Annotation {
+func (m *Interaction_WebSpan) GetAnnotations() []*Interaction_WebSpan_Annotation {
 	if m != nil {
 		return m.Annotations
 	}
 	return nil
 }
 
-func (m *Span) GetMessageEvents() []*MessageEvent {
+func (m *Interaction_WebSpan) GetMessageEvents() []*Interaction_WebSpan_MessageEvent {
 	if m != nil {
 		return m.MessageEvents
 	}
 	return nil
 }
 
-func (m *Span) GetLinks() []*Link {
+func (m *Interaction_WebSpan) GetLinks() []*Interaction_WebSpan_Link {
 	if m != nil {
 		return m.Links
 	}
 	return nil
 }
 
-func (m *Span) GetStatus() *Status {
+func (m *Interaction_WebSpan) GetStatus() *Interaction_WebSpan_Status {
 	if m != nil {
 		return m.Status
 	}
 	return nil
 }
 
-func (m *Span) GetSameProcessAsParentSpan() *wrappers.BoolValue {
+func (m *Interaction_WebSpan) GetSameProcessAsParentSpan() *wrappers.BoolValue {
 	if m != nil {
 		return m.SameProcessAsParentSpan
 	}
 	return nil
 }
 
-func (m *Span) GetChildSpanCount() *wrappers.UInt32Value {
+func (m *Interaction_WebSpan) GetChildSpanCount() *wrappers.UInt32Value {
 	if m != nil {
 		return m.ChildSpanCount
 	}
 	return nil
 }
 
-// The `Status` type defines a logical error model that is suitable for
-// different programming environments, including REST APIs and RPC APIs. This
-// proto's fields are a subset of those of
-// [google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto),
-// which is used by [gRPC](https://github.com/grpc).
-type Status struct {
-	// The status code.
-	Code int32 `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	// A developer-facing error message, which should be in English.
-	Message              string   `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+type Interaction_WebSpan_Annotation struct {
+	Time                 float64         `protobuf:"fixed64,1,opt,name=time,proto3" json:"time,omitempty"`
+	Attributes           *_struct.Struct `protobuf:"bytes,2,opt,name=attributes,proto3" json:"attributes,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
-func (m *Status) Reset()         { *m = Status{} }
-func (m *Status) String() string { return proto.CompactTextString(m) }
-func (*Status) ProtoMessage()    {}
-func (*Status) Descriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{4}
+func (m *Interaction_WebSpan_Annotation) Reset()         { *m = Interaction_WebSpan_Annotation{} }
+func (m *Interaction_WebSpan_Annotation) String() string { return proto.CompactTextString(m) }
+func (*Interaction_WebSpan_Annotation) ProtoMessage()    {}
+func (*Interaction_WebSpan_Annotation) Descriptor() ([]byte, []int) {
+	return fileDescriptor_interaction_6e926e4a72872ffd, []int{0, 1, 1}
 }
-func (m *Status) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Status.Unmarshal(m, b)
+func (m *Interaction_WebSpan_Annotation) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Interaction_WebSpan_Annotation.Unmarshal(m, b)
 }
-func (m *Status) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Status.Marshal(b, m, deterministic)
+func (m *Interaction_WebSpan_Annotation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Interaction_WebSpan_Annotation.Marshal(b, m, deterministic)
 }
-func (dst *Status) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Status.Merge(dst, src)
+func (dst *Interaction_WebSpan_Annotation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Interaction_WebSpan_Annotation.Merge(dst, src)
 }
-func (m *Status) XXX_Size() int {
-	return xxx_messageInfo_Status.Size(m)
+func (m *Interaction_WebSpan_Annotation) XXX_Size() int {
+	return xxx_messageInfo_Interaction_WebSpan_Annotation.Size(m)
 }
-func (m *Status) XXX_DiscardUnknown() {
-	xxx_messageInfo_Status.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Status proto.InternalMessageInfo
-
-func (m *Status) GetCode() int32 {
-	if m != nil {
-		return m.Code
-	}
-	return 0
+func (m *Interaction_WebSpan_Annotation) XXX_DiscardUnknown() {
+	xxx_messageInfo_Interaction_WebSpan_Annotation.DiscardUnknown(m)
 }
 
-func (m *Status) GetMessage() string {
-	if m != nil {
-		return m.Message
-	}
-	return ""
-}
+var xxx_messageInfo_Interaction_WebSpan_Annotation proto.InternalMessageInfo
 
-type Annotation struct {
-	Time                 float64           `protobuf:"fixed64,1,opt,name=time,proto3" json:"time,omitempty"`
-	Attributes           map[string]string `protobuf:"bytes,2,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
-}
-
-func (m *Annotation) Reset()         { *m = Annotation{} }
-func (m *Annotation) String() string { return proto.CompactTextString(m) }
-func (*Annotation) ProtoMessage()    {}
-func (*Annotation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{5}
-}
-func (m *Annotation) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Annotation.Unmarshal(m, b)
-}
-func (m *Annotation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Annotation.Marshal(b, m, deterministic)
-}
-func (dst *Annotation) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Annotation.Merge(dst, src)
-}
-func (m *Annotation) XXX_Size() int {
-	return xxx_messageInfo_Annotation.Size(m)
-}
-func (m *Annotation) XXX_DiscardUnknown() {
-	xxx_messageInfo_Annotation.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Annotation proto.InternalMessageInfo
-
-func (m *Annotation) GetTime() float64 {
+func (m *Interaction_WebSpan_Annotation) GetTime() float64 {
 	if m != nil {
 		return m.Time
 	}
 	return 0
 }
 
-func (m *Annotation) GetAttributes() map[string]string {
+func (m *Interaction_WebSpan_Annotation) GetAttributes() *_struct.Struct {
 	if m != nil {
 		return m.Attributes
 	}
 	return nil
 }
 
-type MessageEvent struct {
+type Interaction_WebSpan_MessageEvent struct {
 	Time                 float64  `protobuf:"fixed64,1,opt,name=time,proto3" json:"time,omitempty"`
 	Id                   uint64   `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
 	UncompressedSize     uint64   `protobuf:"varint,3,opt,name=uncompressed_size,json=uncompressedSize,proto3" json:"uncompressed_size,omitempty"`
@@ -578,607 +875,390 @@ type MessageEvent struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *MessageEvent) Reset()         { *m = MessageEvent{} }
-func (m *MessageEvent) String() string { return proto.CompactTextString(m) }
-func (*MessageEvent) ProtoMessage()    {}
-func (*MessageEvent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{6}
+func (m *Interaction_WebSpan_MessageEvent) Reset()         { *m = Interaction_WebSpan_MessageEvent{} }
+func (m *Interaction_WebSpan_MessageEvent) String() string { return proto.CompactTextString(m) }
+func (*Interaction_WebSpan_MessageEvent) ProtoMessage()    {}
+func (*Interaction_WebSpan_MessageEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_interaction_6e926e4a72872ffd, []int{0, 1, 2}
 }
-func (m *MessageEvent) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_MessageEvent.Unmarshal(m, b)
+func (m *Interaction_WebSpan_MessageEvent) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Interaction_WebSpan_MessageEvent.Unmarshal(m, b)
 }
-func (m *MessageEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_MessageEvent.Marshal(b, m, deterministic)
+func (m *Interaction_WebSpan_MessageEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Interaction_WebSpan_MessageEvent.Marshal(b, m, deterministic)
 }
-func (dst *MessageEvent) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MessageEvent.Merge(dst, src)
+func (dst *Interaction_WebSpan_MessageEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Interaction_WebSpan_MessageEvent.Merge(dst, src)
 }
-func (m *MessageEvent) XXX_Size() int {
-	return xxx_messageInfo_MessageEvent.Size(m)
+func (m *Interaction_WebSpan_MessageEvent) XXX_Size() int {
+	return xxx_messageInfo_Interaction_WebSpan_MessageEvent.Size(m)
 }
-func (m *MessageEvent) XXX_DiscardUnknown() {
-	xxx_messageInfo_MessageEvent.DiscardUnknown(m)
+func (m *Interaction_WebSpan_MessageEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_Interaction_WebSpan_MessageEvent.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MessageEvent proto.InternalMessageInfo
+var xxx_messageInfo_Interaction_WebSpan_MessageEvent proto.InternalMessageInfo
 
-func (m *MessageEvent) GetTime() float64 {
+func (m *Interaction_WebSpan_MessageEvent) GetTime() float64 {
 	if m != nil {
 		return m.Time
 	}
 	return 0
 }
 
-func (m *MessageEvent) GetId() uint64 {
+func (m *Interaction_WebSpan_MessageEvent) GetId() uint64 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
-func (m *MessageEvent) GetUncompressedSize() uint64 {
+func (m *Interaction_WebSpan_MessageEvent) GetUncompressedSize() uint64 {
 	if m != nil {
 		return m.UncompressedSize
 	}
 	return 0
 }
 
-func (m *MessageEvent) GetCompressedSize() uint64 {
+func (m *Interaction_WebSpan_MessageEvent) GetCompressedSize() uint64 {
 	if m != nil {
 		return m.CompressedSize
 	}
 	return 0
 }
 
-type Link struct {
-	TraceId              string            `protobuf:"bytes,1,opt,name=trace_id,json=traceId,proto3" json:"trace_id,omitempty"`
-	SpanId               string            `protobuf:"bytes,2,opt,name=span_id,json=spanId,proto3" json:"span_id,omitempty"`
-	Type                 Link_Type         `protobuf:"varint,3,opt,name=type,proto3,enum=opencensus.proto.interaction.v1.Link_Type" json:"type,omitempty"`
-	Attributes           map[string]string `protobuf:"bytes,4,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+type Interaction_WebSpan_Link struct {
+	TraceId              string                        `protobuf:"bytes,1,opt,name=trace_id,json=traceId,proto3" json:"trace_id,omitempty"`
+	SpanId               string                        `protobuf:"bytes,2,opt,name=span_id,json=spanId,proto3" json:"span_id,omitempty"`
+	Type                 Interaction_WebSpan_Link_Type `protobuf:"varint,3,opt,name=type,proto3,enum=opencensus.proto.interaction.v1.Interaction_WebSpan_Link_Type" json:"type,omitempty"`
+	Attributes           *_struct.Struct               `protobuf:"bytes,4,opt,name=attributes,proto3" json:"attributes,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
+	XXX_unrecognized     []byte                        `json:"-"`
+	XXX_sizecache        int32                         `json:"-"`
 }
 
-func (m *Link) Reset()         { *m = Link{} }
-func (m *Link) String() string { return proto.CompactTextString(m) }
-func (*Link) ProtoMessage()    {}
-func (*Link) Descriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{7}
+func (m *Interaction_WebSpan_Link) Reset()         { *m = Interaction_WebSpan_Link{} }
+func (m *Interaction_WebSpan_Link) String() string { return proto.CompactTextString(m) }
+func (*Interaction_WebSpan_Link) ProtoMessage()    {}
+func (*Interaction_WebSpan_Link) Descriptor() ([]byte, []int) {
+	return fileDescriptor_interaction_6e926e4a72872ffd, []int{0, 1, 3}
 }
-func (m *Link) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Link.Unmarshal(m, b)
+func (m *Interaction_WebSpan_Link) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Interaction_WebSpan_Link.Unmarshal(m, b)
 }
-func (m *Link) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Link.Marshal(b, m, deterministic)
+func (m *Interaction_WebSpan_Link) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Interaction_WebSpan_Link.Marshal(b, m, deterministic)
 }
-func (dst *Link) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Link.Merge(dst, src)
+func (dst *Interaction_WebSpan_Link) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Interaction_WebSpan_Link.Merge(dst, src)
 }
-func (m *Link) XXX_Size() int {
-	return xxx_messageInfo_Link.Size(m)
+func (m *Interaction_WebSpan_Link) XXX_Size() int {
+	return xxx_messageInfo_Interaction_WebSpan_Link.Size(m)
 }
-func (m *Link) XXX_DiscardUnknown() {
-	xxx_messageInfo_Link.DiscardUnknown(m)
+func (m *Interaction_WebSpan_Link) XXX_DiscardUnknown() {
+	xxx_messageInfo_Interaction_WebSpan_Link.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Link proto.InternalMessageInfo
+var xxx_messageInfo_Interaction_WebSpan_Link proto.InternalMessageInfo
 
-func (m *Link) GetTraceId() string {
+func (m *Interaction_WebSpan_Link) GetTraceId() string {
 	if m != nil {
 		return m.TraceId
 	}
 	return ""
 }
 
-func (m *Link) GetSpanId() string {
+func (m *Interaction_WebSpan_Link) GetSpanId() string {
 	if m != nil {
 		return m.SpanId
 	}
 	return ""
 }
 
-func (m *Link) GetType() Link_Type {
+func (m *Interaction_WebSpan_Link) GetType() Interaction_WebSpan_Link_Type {
 	if m != nil {
 		return m.Type
 	}
-	return Link_UNSPECIFIED
+	return Interaction_WebSpan_Link_UNSPECIFIED
 }
 
-func (m *Link) GetAttributes() map[string]string {
+func (m *Interaction_WebSpan_Link) GetAttributes() *_struct.Struct {
 	if m != nil {
 		return m.Attributes
 	}
 	return nil
 }
 
-type PerformanceEntry struct {
-	Name                       string                     `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	InitiatorType              string                     `protobuf:"bytes,2,opt,name=initiator_type,json=initiatorType,proto3" json:"initiator_type,omitempty"`
-	NextHopProtocol            string                     `protobuf:"bytes,3,opt,name=next_hop_protocol,json=nextHopProtocol,proto3" json:"next_hop_protocol,omitempty"`
-	EntryType                  string                     `protobuf:"bytes,4,opt,name=entry_type,json=entryType,proto3" json:"entry_type,omitempty"`
-	SecureConnectionStart      float64                    `protobuf:"fixed64,5,opt,name=secure_connection_start,json=secureConnectionStart,proto3" json:"secure_connection_start,omitempty"`
-	TransferSize               float64                    `protobuf:"fixed64,6,opt,name=transfer_size,json=transferSize,proto3" json:"transfer_size,omitempty"`
-	EncodedBodySize            float64                    `protobuf:"fixed64,7,opt,name=encoded_body_size,json=encodedBodySize,proto3" json:"encoded_body_size,omitempty"`
-	DecodedBodySize            float64                    `protobuf:"fixed64,8,opt,name=decoded_body_size,json=decodedBodySize,proto3" json:"decoded_body_size,omitempty"`
-	StartTime                  float64                    `protobuf:"fixed64,9,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	Duration                   float64                    `protobuf:"fixed64,10,opt,name=duration,proto3" json:"duration,omitempty"`
-	ConnectEnd                 float64                    `protobuf:"fixed64,11,opt,name=connect_end,json=connectEnd,proto3" json:"connect_end,omitempty"`
-	ConnectStart               float64                    `protobuf:"fixed64,12,opt,name=connect_start,json=connectStart,proto3" json:"connect_start,omitempty"`
-	DomComplete                float64                    `protobuf:"fixed64,13,opt,name=dom_complete,json=domComplete,proto3" json:"dom_complete,omitempty"`
-	DomContentLoadedEventEnd   float64                    `protobuf:"fixed64,14,opt,name=dom_content_loaded_event_end,json=domContentLoadedEventEnd,proto3" json:"dom_content_loaded_event_end,omitempty"`
-	DomContentLoadedEventStart float64                    `protobuf:"fixed64,15,opt,name=dom_content_loaded_event_start,json=domContentLoadedEventStart,proto3" json:"dom_content_loaded_event_start,omitempty"`
-	DomInteractive             float64                    `protobuf:"fixed64,16,opt,name=dom_interactive,json=domInteractive,proto3" json:"dom_interactive,omitempty"`
-	DomLoading                 float64                    `protobuf:"fixed64,17,opt,name=dom_loading,json=domLoading,proto3" json:"dom_loading,omitempty"`
-	DomainLookupEnd            float64                    `protobuf:"fixed64,18,opt,name=domain_lookup_end,json=domainLookupEnd,proto3" json:"domain_lookup_end,omitempty"`
-	DomainLookupStart          float64                    `protobuf:"fixed64,19,opt,name=domain_lookup_start,json=domainLookupStart,proto3" json:"domain_lookup_start,omitempty"`
-	FetchStart                 float64                    `protobuf:"fixed64,20,opt,name=fetch_start,json=fetchStart,proto3" json:"fetch_start,omitempty"`
-	LoadEventEnd               float64                    `protobuf:"fixed64,21,opt,name=load_event_end,json=loadEventEnd,proto3" json:"load_event_end,omitempty"`
-	LoadEventStart             float64                    `protobuf:"fixed64,22,opt,name=load_event_start,json=loadEventStart,proto3" json:"load_event_start,omitempty"`
-	NavigationStart            float64                    `protobuf:"fixed64,23,opt,name=navigation_start,json=navigationStart,proto3" json:"navigation_start,omitempty"`
-	RedirectCount              float64                    `protobuf:"fixed64,24,opt,name=redirect_count,json=redirectCount,proto3" json:"redirect_count,omitempty"`
-	RedirectEnd                float64                    `protobuf:"fixed64,25,opt,name=redirect_end,json=redirectEnd,proto3" json:"redirect_end,omitempty"`
-	RedirectStart              float64                    `protobuf:"fixed64,26,opt,name=redirect_start,json=redirectStart,proto3" json:"redirect_start,omitempty"`
-	RequestStart               float64                    `protobuf:"fixed64,27,opt,name=request_start,json=requestStart,proto3" json:"request_start,omitempty"`
-	ResponseEnd                float64                    `protobuf:"fixed64,28,opt,name=response_end,json=responseEnd,proto3" json:"response_end,omitempty"`
-	ResponseStart              float64                    `protobuf:"fixed64,29,opt,name=response_start,json=responseStart,proto3" json:"response_start,omitempty"`
-	Type                       string                     `protobuf:"bytes,30,opt,name=type,proto3" json:"type,omitempty"`
-	UnloadEventEnd             float64                    `protobuf:"fixed64,31,opt,name=unload_event_end,json=unloadEventEnd,proto3" json:"unload_event_end,omitempty"`
-	UnloadEventStart           float64                    `protobuf:"fixed64,32,opt,name=unload_event_start,json=unloadEventStart,proto3" json:"unload_event_start,omitempty"`
-	WorkerStart                float64                    `protobuf:"fixed64,33,opt,name=worker_start,json=workerStart,proto3" json:"worker_start,omitempty"`
-	ServerTiming               []*PerformanceServerTiming `protobuf:"bytes,34,rep,name=server_timing,json=serverTiming,proto3" json:"server_timing,omitempty"`
-	XXX_NoUnkeyedLiteral       struct{}                   `json:"-"`
-	XXX_unrecognized           []byte                     `json:"-"`
-	XXX_sizecache              int32                      `json:"-"`
-}
-
-func (m *PerformanceEntry) Reset()         { *m = PerformanceEntry{} }
-func (m *PerformanceEntry) String() string { return proto.CompactTextString(m) }
-func (*PerformanceEntry) ProtoMessage()    {}
-func (*PerformanceEntry) Descriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{8}
-}
-func (m *PerformanceEntry) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PerformanceEntry.Unmarshal(m, b)
-}
-func (m *PerformanceEntry) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PerformanceEntry.Marshal(b, m, deterministic)
-}
-func (dst *PerformanceEntry) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PerformanceEntry.Merge(dst, src)
-}
-func (m *PerformanceEntry) XXX_Size() int {
-	return xxx_messageInfo_PerformanceEntry.Size(m)
-}
-func (m *PerformanceEntry) XXX_DiscardUnknown() {
-	xxx_messageInfo_PerformanceEntry.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PerformanceEntry proto.InternalMessageInfo
-
-func (m *PerformanceEntry) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *PerformanceEntry) GetInitiatorType() string {
-	if m != nil {
-		return m.InitiatorType
-	}
-	return ""
-}
-
-func (m *PerformanceEntry) GetNextHopProtocol() string {
-	if m != nil {
-		return m.NextHopProtocol
-	}
-	return ""
-}
-
-func (m *PerformanceEntry) GetEntryType() string {
-	if m != nil {
-		return m.EntryType
-	}
-	return ""
-}
-
-func (m *PerformanceEntry) GetSecureConnectionStart() float64 {
-	if m != nil {
-		return m.SecureConnectionStart
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetTransferSize() float64 {
-	if m != nil {
-		return m.TransferSize
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetEncodedBodySize() float64 {
-	if m != nil {
-		return m.EncodedBodySize
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetDecodedBodySize() float64 {
-	if m != nil {
-		return m.DecodedBodySize
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetStartTime() float64 {
-	if m != nil {
-		return m.StartTime
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetDuration() float64 {
-	if m != nil {
-		return m.Duration
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetConnectEnd() float64 {
-	if m != nil {
-		return m.ConnectEnd
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetConnectStart() float64 {
-	if m != nil {
-		return m.ConnectStart
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetDomComplete() float64 {
-	if m != nil {
-		return m.DomComplete
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetDomContentLoadedEventEnd() float64 {
-	if m != nil {
-		return m.DomContentLoadedEventEnd
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetDomContentLoadedEventStart() float64 {
-	if m != nil {
-		return m.DomContentLoadedEventStart
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetDomInteractive() float64 {
-	if m != nil {
-		return m.DomInteractive
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetDomLoading() float64 {
-	if m != nil {
-		return m.DomLoading
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetDomainLookupEnd() float64 {
-	if m != nil {
-		return m.DomainLookupEnd
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetDomainLookupStart() float64 {
-	if m != nil {
-		return m.DomainLookupStart
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetFetchStart() float64 {
-	if m != nil {
-		return m.FetchStart
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetLoadEventEnd() float64 {
-	if m != nil {
-		return m.LoadEventEnd
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetLoadEventStart() float64 {
-	if m != nil {
-		return m.LoadEventStart
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetNavigationStart() float64 {
-	if m != nil {
-		return m.NavigationStart
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetRedirectCount() float64 {
-	if m != nil {
-		return m.RedirectCount
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetRedirectEnd() float64 {
-	if m != nil {
-		return m.RedirectEnd
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetRedirectStart() float64 {
-	if m != nil {
-		return m.RedirectStart
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetRequestStart() float64 {
-	if m != nil {
-		return m.RequestStart
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetResponseEnd() float64 {
-	if m != nil {
-		return m.ResponseEnd
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetResponseStart() float64 {
-	if m != nil {
-		return m.ResponseStart
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetType() string {
-	if m != nil {
-		return m.Type
-	}
-	return ""
-}
-
-func (m *PerformanceEntry) GetUnloadEventEnd() float64 {
-	if m != nil {
-		return m.UnloadEventEnd
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetUnloadEventStart() float64 {
-	if m != nil {
-		return m.UnloadEventStart
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetWorkerStart() float64 {
-	if m != nil {
-		return m.WorkerStart
-	}
-	return 0
-}
-
-func (m *PerformanceEntry) GetServerTiming() []*PerformanceServerTiming {
-	if m != nil {
-		return m.ServerTiming
-	}
-	return nil
-}
-
-type PerformanceServerTiming struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Description          string   `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Duration             float64  `protobuf:"fixed64,3,opt,name=duration,proto3" json:"duration,omitempty"`
+// The `Status` type defines a logical error model that is suitable for
+// different programming environments, including REST APIs and RPC APIs.
+// This proto's fields are a subset of those of
+// [google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto),
+// which is used by [gRPC](https://github.com/grpc).
+type Interaction_WebSpan_Status struct {
+	// The HTTP status code associated with the.
+	Code int32 `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	// A developer-facing error message, which should be in English.
+	Message              string   `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *PerformanceServerTiming) Reset()         { *m = PerformanceServerTiming{} }
-func (m *PerformanceServerTiming) String() string { return proto.CompactTextString(m) }
-func (*PerformanceServerTiming) ProtoMessage()    {}
-func (*PerformanceServerTiming) Descriptor() ([]byte, []int) {
-	return fileDescriptor_interaction_4c400bbefcf5e6f7, []int{9}
+func (m *Interaction_WebSpan_Status) Reset()         { *m = Interaction_WebSpan_Status{} }
+func (m *Interaction_WebSpan_Status) String() string { return proto.CompactTextString(m) }
+func (*Interaction_WebSpan_Status) ProtoMessage()    {}
+func (*Interaction_WebSpan_Status) Descriptor() ([]byte, []int) {
+	return fileDescriptor_interaction_6e926e4a72872ffd, []int{0, 1, 4}
 }
-func (m *PerformanceServerTiming) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PerformanceServerTiming.Unmarshal(m, b)
+func (m *Interaction_WebSpan_Status) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Interaction_WebSpan_Status.Unmarshal(m, b)
 }
-func (m *PerformanceServerTiming) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PerformanceServerTiming.Marshal(b, m, deterministic)
+func (m *Interaction_WebSpan_Status) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Interaction_WebSpan_Status.Marshal(b, m, deterministic)
 }
-func (dst *PerformanceServerTiming) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PerformanceServerTiming.Merge(dst, src)
+func (dst *Interaction_WebSpan_Status) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Interaction_WebSpan_Status.Merge(dst, src)
 }
-func (m *PerformanceServerTiming) XXX_Size() int {
-	return xxx_messageInfo_PerformanceServerTiming.Size(m)
+func (m *Interaction_WebSpan_Status) XXX_Size() int {
+	return xxx_messageInfo_Interaction_WebSpan_Status.Size(m)
 }
-func (m *PerformanceServerTiming) XXX_DiscardUnknown() {
-	xxx_messageInfo_PerformanceServerTiming.DiscardUnknown(m)
+func (m *Interaction_WebSpan_Status) XXX_DiscardUnknown() {
+	xxx_messageInfo_Interaction_WebSpan_Status.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_PerformanceServerTiming proto.InternalMessageInfo
+var xxx_messageInfo_Interaction_WebSpan_Status proto.InternalMessageInfo
 
-func (m *PerformanceServerTiming) GetName() string {
+func (m *Interaction_WebSpan_Status) GetCode() int32 {
+	if m != nil {
+		return m.Code
+	}
+	return 0
+}
+
+func (m *Interaction_WebSpan_Status) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
+// Information about the OpenCensus web library that measured the interaction.
+// This is a simplified version of the LibraryInfo message used to write
+// server side Spans. There is no `Language` field currently as we assume the
+// language writing web interaction data is browser JavaScript. See
+// https://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/agent/common/v1/common.proto
+type Interaction_LibraryInfo struct {
+	// The version of the OpenCensus web client library.
+	LibraryVersion string `protobuf:"bytes,2,opt,name=library_version,json=libraryVersion,proto3" json:"library_version,omitempty"`
+	// The version of the OpenCensus web Agent exporter library. If omitted,
+	// this is assumed to be the same as `library_version`.
+	ExporterVersion      string   `protobuf:"bytes,3,opt,name=exporter_version,json=exporterVersion,proto3" json:"exporter_version,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Interaction_LibraryInfo) Reset()         { *m = Interaction_LibraryInfo{} }
+func (m *Interaction_LibraryInfo) String() string { return proto.CompactTextString(m) }
+func (*Interaction_LibraryInfo) ProtoMessage()    {}
+func (*Interaction_LibraryInfo) Descriptor() ([]byte, []int) {
+	return fileDescriptor_interaction_6e926e4a72872ffd, []int{0, 2}
+}
+func (m *Interaction_LibraryInfo) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Interaction_LibraryInfo.Unmarshal(m, b)
+}
+func (m *Interaction_LibraryInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Interaction_LibraryInfo.Marshal(b, m, deterministic)
+}
+func (dst *Interaction_LibraryInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Interaction_LibraryInfo.Merge(dst, src)
+}
+func (m *Interaction_LibraryInfo) XXX_Size() int {
+	return xxx_messageInfo_Interaction_LibraryInfo.Size(m)
+}
+func (m *Interaction_LibraryInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_Interaction_LibraryInfo.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Interaction_LibraryInfo proto.InternalMessageInfo
+
+func (m *Interaction_LibraryInfo) GetLibraryVersion() string {
+	if m != nil {
+		return m.LibraryVersion
+	}
+	return ""
+}
+
+func (m *Interaction_LibraryInfo) GetExporterVersion() string {
+	if m != nil {
+		return m.ExporterVersion
+	}
+	return ""
+}
+
+// Service description for the web UI that generated the interaction.
+type Interaction_ServiceInfo struct {
+	// Name of the service.
+	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Interaction_ServiceInfo) Reset()         { *m = Interaction_ServiceInfo{} }
+func (m *Interaction_ServiceInfo) String() string { return proto.CompactTextString(m) }
+func (*Interaction_ServiceInfo) ProtoMessage()    {}
+func (*Interaction_ServiceInfo) Descriptor() ([]byte, []int) {
+	return fileDescriptor_interaction_6e926e4a72872ffd, []int{0, 3}
+}
+func (m *Interaction_ServiceInfo) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Interaction_ServiceInfo.Unmarshal(m, b)
+}
+func (m *Interaction_ServiceInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Interaction_ServiceInfo.Marshal(b, m, deterministic)
+}
+func (dst *Interaction_ServiceInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Interaction_ServiceInfo.Merge(dst, src)
+}
+func (m *Interaction_ServiceInfo) XXX_Size() int {
+	return xxx_messageInfo_Interaction_ServiceInfo.Size(m)
+}
+func (m *Interaction_ServiceInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_Interaction_ServiceInfo.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Interaction_ServiceInfo proto.InternalMessageInfo
+
+func (m *Interaction_ServiceInfo) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *PerformanceServerTiming) GetDescription() string {
-	if m != nil {
-		return m.Description
-	}
-	return ""
-}
-
-func (m *PerformanceServerTiming) GetDuration() float64 {
-	if m != nil {
-		return m.Duration
-	}
-	return 0
-}
-
 func init() {
 	proto.RegisterType((*Interaction)(nil), "opencensus.proto.interaction.v1.Interaction")
 	proto.RegisterMapType((map[string]string)(nil), "opencensus.proto.interaction.v1.Interaction.ClientAttributesEntry")
-	proto.RegisterType((*LibraryInfo)(nil), "opencensus.proto.interaction.v1.LibraryInfo")
-	proto.RegisterType((*ServiceInfo)(nil), "opencensus.proto.interaction.v1.ServiceInfo")
-	proto.RegisterType((*Span)(nil), "opencensus.proto.interaction.v1.Span")
-	proto.RegisterMapType((map[string]string)(nil), "opencensus.proto.interaction.v1.Span.AttributesEntry")
-	proto.RegisterMapType((map[string]string)(nil), "opencensus.proto.interaction.v1.Span.TracestateEntry")
-	proto.RegisterType((*Status)(nil), "opencensus.proto.interaction.v1.Status")
-	proto.RegisterType((*Annotation)(nil), "opencensus.proto.interaction.v1.Annotation")
-	proto.RegisterMapType((map[string]string)(nil), "opencensus.proto.interaction.v1.Annotation.AttributesEntry")
-	proto.RegisterType((*MessageEvent)(nil), "opencensus.proto.interaction.v1.MessageEvent")
-	proto.RegisterType((*Link)(nil), "opencensus.proto.interaction.v1.Link")
-	proto.RegisterMapType((map[string]string)(nil), "opencensus.proto.interaction.v1.Link.AttributesEntry")
-	proto.RegisterType((*PerformanceEntry)(nil), "opencensus.proto.interaction.v1.PerformanceEntry")
-	proto.RegisterType((*PerformanceServerTiming)(nil), "opencensus.proto.interaction.v1.PerformanceServerTiming")
-	proto.RegisterEnum("opencensus.proto.interaction.v1.LibraryInfo_Language", LibraryInfo_Language_name, LibraryInfo_Language_value)
-	proto.RegisterEnum("opencensus.proto.interaction.v1.Span_SpanKind", Span_SpanKind_name, Span_SpanKind_value)
-	proto.RegisterEnum("opencensus.proto.interaction.v1.Link_Type", Link_Type_name, Link_Type_value)
+	proto.RegisterType((*Interaction_PerformanceEntry)(nil), "opencensus.proto.interaction.v1.Interaction.PerformanceEntry")
+	proto.RegisterType((*Interaction_PerformanceEntry_PerformanceServerTiming)(nil), "opencensus.proto.interaction.v1.Interaction.PerformanceEntry.PerformanceServerTiming")
+	proto.RegisterType((*Interaction_WebSpan)(nil), "opencensus.proto.interaction.v1.Interaction.WebSpan")
+	proto.RegisterMapType((map[string]string)(nil), "opencensus.proto.interaction.v1.Interaction.WebSpan.TracestateEntry")
+	proto.RegisterType((*Interaction_WebSpan_Annotation)(nil), "opencensus.proto.interaction.v1.Interaction.WebSpan.Annotation")
+	proto.RegisterType((*Interaction_WebSpan_MessageEvent)(nil), "opencensus.proto.interaction.v1.Interaction.WebSpan.MessageEvent")
+	proto.RegisterType((*Interaction_WebSpan_Link)(nil), "opencensus.proto.interaction.v1.Interaction.WebSpan.Link")
+	proto.RegisterType((*Interaction_WebSpan_Status)(nil), "opencensus.proto.interaction.v1.Interaction.WebSpan.Status")
+	proto.RegisterType((*Interaction_LibraryInfo)(nil), "opencensus.proto.interaction.v1.Interaction.LibraryInfo")
+	proto.RegisterType((*Interaction_ServiceInfo)(nil), "opencensus.proto.interaction.v1.Interaction.ServiceInfo")
+	proto.RegisterEnum("opencensus.proto.interaction.v1.Interaction_WebSpan_SpanKind", Interaction_WebSpan_SpanKind_name, Interaction_WebSpan_SpanKind_value)
+	proto.RegisterEnum("opencensus.proto.interaction.v1.Interaction_WebSpan_Link_Type", Interaction_WebSpan_Link_Type_name, Interaction_WebSpan_Link_Type_value)
 }
 
 func init() {
-	proto.RegisterFile("github.com/census-instrumentation/opencensus-proto/src/opencensus/proto/interaction/v1/interaction.proto", fileDescriptor_interaction_4c400bbefcf5e6f7)
+	proto.RegisterFile("github.com/census-instrumentation/opencensus-proto/src/opencensus/proto/interaction/v1/interaction.proto", fileDescriptor_interaction_6e926e4a72872ffd)
 }
 
-var fileDescriptor_interaction_4c400bbefcf5e6f7 = []byte{
-	// 1692 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x58, 0xe1, 0x6e, 0x1b, 0xc7,
-	0x11, 0x0e, 0x25, 0x4a, 0xa6, 0x86, 0x12, 0x45, 0xad, 0xad, 0xe8, 0xac, 0xd8, 0x96, 0xcc, 0xc6,
-	0xb0, 0xe2, 0xc4, 0x54, 0xad, 0x20, 0x41, 0xd0, 0x20, 0x29, 0x24, 0x8a, 0x86, 0x59, 0x33, 0x0a,
-	0x7b, 0x94, 0x8d, 0xa2, 0x45, 0x71, 0x38, 0xdd, 0xad, 0xa8, 0x85, 0xc8, 0xdd, 0xeb, 0xee, 0x52,
-	0x89, 0xf2, 0xa7, 0xbf, 0x0a, 0xf4, 0x09, 0xfa, 0x14, 0x7d, 0x84, 0x3e, 0x44, 0x7f, 0xf6, 0x71,
-	0x8a, 0x9d, 0xb9, 0x3b, 0x1e, 0x59, 0xc5, 0x92, 0x6a, 0xe4, 0x8f, 0xc0, 0xfd, 0xf6, 0x9b, 0x6f,
-	0x67, 0x67, 0x67, 0x67, 0xf6, 0x04, 0x67, 0x03, 0x61, 0xcf, 0xc6, 0x27, 0xcd, 0x48, 0x8d, 0x76,
-	0x23, 0x2e, 0xcd, 0xd8, 0x3c, 0x17, 0xd2, 0x58, 0x3d, 0x1e, 0x71, 0x69, 0x43, 0x2b, 0x94, 0xdc,
-	0x55, 0x09, 0x97, 0xe9, 0x54, 0xa2, 0x95, 0x55, 0xbb, 0x46, 0x47, 0x05, 0x70, 0x97, 0x40, 0x21,
-	0x2d, 0xd7, 0x61, 0x84, 0x16, 0x17, 0x2f, 0x8a, 0xc3, 0x26, 0x12, 0xd8, 0xd6, 0xc4, 0x84, 0x90,
-	0x66, 0x91, 0x73, 0xf1, 0x62, 0xf3, 0xd1, 0x40, 0xa9, 0xc1, 0x90, 0x93, 0xde, 0xc9, 0xf8, 0x74,
-	0xf7, 0x07, 0x1d, 0x26, 0x09, 0xd7, 0x29, 0xbd, 0xf1, 0xcf, 0x05, 0xa8, 0x76, 0x26, 0x26, 0xec,
-	0x3e, 0x54, 0xac, 0x0e, 0x23, 0x1e, 0x88, 0xd8, 0x2b, 0x6d, 0x97, 0x76, 0x96, 0xfc, 0x3b, 0x38,
-	0xee, 0xc4, 0x6c, 0x0b, 0xaa, 0x56, 0x8c, 0x78, 0xa0, 0xb4, 0x18, 0x08, 0xe9, 0xcd, 0x6d, 0x97,
-	0x76, 0x4a, 0x3e, 0x38, 0xe8, 0x7b, 0x44, 0xd8, 0xaf, 0xe1, 0x9e, 0xe1, 0xfa, 0x82, 0xeb, 0x40,
-	0xf3, 0xbf, 0x8c, 0xb9, 0xb1, 0x81, 0xb1, 0xa1, 0xb6, 0xde, 0x3c, 0x32, 0x19, 0xcd, 0xf9, 0x34,
-	0xd5, 0x77, 0x33, 0xec, 0x4b, 0xd8, 0x98, 0xb1, 0x88, 0xc7, 0x1a, 0x03, 0xe4, 0x95, 0xd1, 0x68,
-	0x7d, 0xca, 0xe8, 0x30, 0x9d, 0x64, 0x5f, 0xc3, 0x82, 0x49, 0x42, 0x69, 0xbc, 0x85, 0xed, 0xf9,
-	0x9d, 0xea, 0xde, 0x93, 0xe6, 0x35, 0x61, 0x68, 0xf6, 0x93, 0x50, 0xfa, 0x64, 0xc3, 0x4e, 0xe0,
-	0x6e, 0xc2, 0xf5, 0xa9, 0xd2, 0xa3, 0x50, 0x46, 0x3c, 0xe0, 0xd2, 0x6a, 0xc1, 0x8d, 0xb7, 0x88,
-	0x52, 0x2f, 0xae, 0x95, 0xea, 0x4d, 0x6c, 0xdb, 0xd2, 0xea, 0x4b, 0x9f, 0x25, 0xd3, 0x88, 0xe0,
-	0x86, 0x7d, 0x0f, 0xcb, 0x43, 0x71, 0xa2, 0x43, 0x7d, 0x19, 0x08, 0x79, 0xaa, 0xbc, 0x3b, 0xdb,
-	0xa5, 0x9d, 0xea, 0xde, 0x67, 0xd7, 0x8a, 0x77, 0xc9, 0xa8, 0x23, 0x4f, 0x95, 0x5f, 0x1d, 0x4e,
-	0x06, 0x4e, 0xd0, 0x85, 0x42, 0xb8, 0x93, 0x71, 0x82, 0x95, 0x1b, 0x0a, 0xf6, 0xc9, 0x88, 0x04,
-	0xcd, 0x64, 0xc0, 0x14, 0xac, 0x45, 0x43, 0xc1, 0xa5, 0x0d, 0x42, 0x6b, 0xb5, 0x38, 0x19, 0x5b,
-	0x6e, 0xbc, 0x25, 0x8c, 0xc1, 0xc1, 0xb5, 0xaa, 0x85, 0x8c, 0x69, 0xb6, 0x50, 0x65, 0x3f, 0x17,
-	0xa1, 0xa0, 0xd4, 0xa3, 0x19, 0x78, 0xb3, 0x05, 0xeb, 0x57, 0x52, 0x59, 0x1d, 0xe6, 0xcf, 0xf9,
-	0x65, 0x9a, 0x6d, 0xee, 0x27, 0xbb, 0x07, 0x0b, 0x17, 0xe1, 0x70, 0xcc, 0x31, 0xc7, 0x96, 0x7c,
-	0x1a, 0xfc, 0x66, 0xee, 0xab, 0x52, 0xe3, 0xdf, 0x25, 0xa8, 0x16, 0x62, 0xc4, 0x7e, 0x0f, 0x95,
-	0x61, 0x28, 0x07, 0xe3, 0x70, 0xc0, 0x51, 0xa0, 0xb6, 0xf7, 0xc5, 0x6d, 0x62, 0xdc, 0xec, 0xa6,
-	0xc6, 0x7e, 0x2e, 0xc3, 0x9e, 0xc2, 0x6a, 0x76, 0x74, 0x17, 0x5c, 0x1b, 0x97, 0x8b, 0xe4, 0x46,
-	0x2d, 0x85, 0xdf, 0x12, 0xca, 0x3e, 0x81, 0x3a, 0xff, 0x31, 0x51, 0xda, 0x72, 0x9d, 0x33, 0xe7,
-	0x91, 0xb9, 0x9a, 0xe1, 0x29, 0xb5, 0xb1, 0x09, 0x95, 0x6c, 0x25, 0x56, 0x03, 0xf8, 0xdd, 0xfe,
-	0xdb, 0xfd, 0x7e, 0xcb, 0xef, 0xf4, 0x8e, 0xeb, 0x1f, 0x34, 0x1e, 0x43, 0xb5, 0x70, 0x48, 0x8c,
-	0x41, 0x59, 0x86, 0x23, 0x9e, 0x86, 0x03, 0x7f, 0x37, 0xfe, 0x51, 0x81, 0xb2, 0xcb, 0x60, 0xb6,
-	0x01, 0x77, 0x5c, 0x0e, 0x4f, 0x2e, 0xe7, 0xa2, 0x1b, 0x76, 0x62, 0xf6, 0x06, 0x00, 0xaf, 0xa9,
-	0xb1, 0xa1, 0x75, 0x61, 0x73, 0xc7, 0xf8, 0xc5, 0x8d, 0x6e, 0x45, 0xf3, 0x38, 0xb7, 0xa3, 0x93,
-	0x2b, 0x08, 0xb1, 0x8f, 0xa1, 0x96, 0x84, 0xda, 0x25, 0x49, 0xb6, 0x2c, 0x6d, 0x70, 0x99, 0xd0,
-	0x3e, 0x2d, 0x9e, 0xb9, 0x5c, 0x9e, 0xb8, 0xcc, 0x0e, 0xa0, 0x7c, 0x2e, 0x64, 0xec, 0x2d, 0xe0,
-	0xa1, 0x34, 0x6f, 0xe6, 0x8a, 0xfb, 0xf3, 0x5a, 0xc8, 0xd8, 0x47, 0x5b, 0x97, 0x06, 0x54, 0x40,
-	0x16, 0xb1, 0x16, 0xd0, 0xc0, 0xa5, 0x0b, 0x97, 0x31, 0xde, 0xa8, 0x92, 0xef, 0x7e, 0xba, 0xcd,
-	0x17, 0x72, 0xb8, 0x72, 0x9b, 0xcd, 0xcf, 0xa6, 0x6d, 0x41, 0xc8, 0xd5, 0x3b, 0x63, 0xc3, 0xe8,
-	0x3c, 0xc0, 0x80, 0x78, 0x4b, 0xb8, 0x3b, 0x40, 0x08, 0x63, 0xc6, 0xbe, 0x83, 0x6a, 0x28, 0xa5,
-	0xa2, 0x8a, 0x6e, 0x3c, 0xc0, 0x85, 0x3f, 0xbd, 0x76, 0xe1, 0xfd, 0xdc, 0xc6, 0x2f, 0xda, 0xb3,
-	0x63, 0xa8, 0x8d, 0xb8, 0x31, 0xe1, 0x80, 0x07, 0xfc, 0x82, 0x4b, 0x6b, 0xbc, 0x2a, 0x2a, 0x3e,
-	0xbf, 0x56, 0xf1, 0x3b, 0x32, 0x6b, 0x3b, 0x2b, 0x7f, 0x65, 0x54, 0x18, 0x19, 0x57, 0x2a, 0x87,
-	0x42, 0x9e, 0x1b, 0x6f, 0xf9, 0x86, 0xa5, 0xb2, 0x2b, 0xe4, 0xb9, 0x4f, 0x36, 0xec, 0xb7, 0xb0,
-	0xe8, 0x12, 0x61, 0x6c, 0xbc, 0x15, 0xac, 0x37, 0x4f, 0xaf, 0x8f, 0x2a, 0xd2, 0xfd, 0xd4, 0x8c,
-	0xfd, 0x01, 0x3e, 0x32, 0xe1, 0x88, 0x07, 0x89, 0x56, 0x11, 0x37, 0x26, 0x08, 0x4d, 0x50, 0x48,
-	0x28, 0xaf, 0x86, 0xaa, 0x9b, 0x4d, 0x6a, 0x52, 0xcd, 0xac, 0x49, 0x35, 0x0f, 0x94, 0x1a, 0xbe,
-	0x75, 0x97, 0xde, 0xdf, 0x70, 0xe6, 0x3d, 0xb2, 0xde, 0x37, 0xbd, 0x3c, 0xed, 0xd8, 0x4b, 0xa8,
-	0x47, 0x67, 0x62, 0x18, 0x53, 0x66, 0x46, 0x6a, 0x2c, 0xad, 0xb7, 0x8a, 0x72, 0x0f, 0xfe, 0x47,
-	0xee, 0x4d, 0x47, 0xda, 0xcf, 0xf7, 0x48, 0xb0, 0x86, 0x56, 0x4e, 0xa2, 0xe5, 0x6c, 0x36, 0xbf,
-	0x81, 0xd5, 0x99, 0x1b, 0x70, 0x9b, 0x82, 0xe4, 0xcc, 0xdf, 0xa7, 0x9e, 0x7d, 0x03, 0x95, 0x2c,
-	0xe9, 0xd9, 0x7d, 0x58, 0xef, 0xf7, 0xf6, 0x8f, 0x82, 0xd7, 0x9d, 0xa3, 0xc3, 0xe0, 0xcd, 0x51,
-	0xbf, 0xd7, 0x6e, 0x75, 0x5e, 0x76, 0xda, 0x87, 0xf5, 0x0f, 0x18, 0xc0, 0x62, 0xbf, 0xed, 0xbf,
-	0x6d, 0xfb, 0xf5, 0x92, 0xfb, 0xdd, 0xea, 0x76, 0xda, 0x47, 0xc7, 0xf5, 0xb9, 0xc6, 0x97, 0xb0,
-	0x48, 0x01, 0x77, 0x77, 0x30, 0x52, 0x31, 0x95, 0x8d, 0x05, 0x1f, 0x7f, 0x33, 0x0f, 0xee, 0xa4,
-	0xb9, 0x90, 0x2e, 0x9c, 0x0d, 0x1b, 0xff, 0x2a, 0x01, 0x4c, 0xd2, 0xd0, 0x19, 0xbb, 0x36, 0x8e,
-	0xc6, 0x25, 0x1f, 0x7f, 0xb3, 0x3f, 0x4d, 0x5d, 0x2a, 0xaa, 0x28, 0x5f, 0xdf, 0x22, 0xb7, 0xdf,
-	0x75, 0xb5, 0xde, 0x37, 0x6a, 0x7f, 0x2f, 0xc1, 0x72, 0x31, 0xe7, 0xaf, 0xdc, 0x40, 0x0d, 0xe6,
-	0x44, 0x8c, 0xb6, 0x65, 0x7f, 0x4e, 0xc4, 0xec, 0x53, 0x58, 0x1b, 0xcb, 0x48, 0x8d, 0x12, 0xcd,
-	0x8d, 0xe1, 0x71, 0x60, 0xc4, 0x4f, 0x1c, 0xcb, 0x59, 0xd9, 0xaf, 0x17, 0x27, 0xfa, 0xe2, 0x27,
-	0x6c, 0x02, 0xb3, 0xd4, 0x32, 0x52, 0x6b, 0xd3, 0xc4, 0xc6, 0x7f, 0xe6, 0xa0, 0xec, 0x6e, 0xcc,
-	0xbb, 0x1e, 0x4e, 0x85, 0xaa, 0x3d, 0x37, 0x55, 0xb5, 0xbf, 0x85, 0xb2, 0xbd, 0x4c, 0xc8, 0x8b,
-	0xda, 0xde, 0xb3, 0x1b, 0x5d, 0xcd, 0xe6, 0xf1, 0x65, 0xc2, 0x7d, 0xb4, 0x9b, 0x29, 0x7c, 0xe5,
-	0x1b, 0x16, 0x3e, 0x54, 0xf9, 0x05, 0x4f, 0xe7, 0x25, 0x94, 0x9d, 0x8f, 0x6c, 0x15, 0xaa, 0xd3,
-	0x59, 0xbc, 0x0e, 0x6b, 0xad, 0x57, 0x9d, 0xee, 0x61, 0xd0, 0xed, 0x1c, 0xbd, 0x6e, 0x1f, 0x06,
-	0x2e, 0xdb, 0xeb, 0x25, 0xf6, 0x21, 0xb0, 0xde, 0xbe, 0xdf, 0x3e, 0x3a, 0x9e, 0xc2, 0xe7, 0x1a,
-	0x7f, 0xab, 0x42, 0x7d, 0xf6, 0xb1, 0x75, 0x55, 0x7b, 0x64, 0x4f, 0xa0, 0x26, 0xa4, 0xb0, 0x22,
-	0xb4, 0x4a, 0x07, 0x18, 0x50, 0xf2, 0x69, 0x25, 0x47, 0xd1, 0x9f, 0x67, 0xb0, 0x26, 0xf9, 0x8f,
-	0x36, 0x38, 0x53, 0x49, 0x80, 0x81, 0x89, 0xd4, 0x30, 0x6b, 0xd8, 0x6e, 0xe2, 0x95, 0x4a, 0x7a,
-	0x29, 0xcc, 0x1e, 0x02, 0xb8, 0x77, 0xe1, 0x25, 0xc9, 0x51, 0x63, 0x5b, 0x42, 0x04, 0xa5, 0xf0,
-	0xdd, 0x1a, 0x8d, 0x35, 0x0f, 0x22, 0x25, 0x25, 0xc7, 0xd0, 0xa6, 0x8f, 0xdd, 0x85, 0xec, 0xdd,
-	0xea, 0xa6, 0x5b, 0xf9, 0x2c, 0xbd, 0x77, 0x7f, 0x05, 0x2b, 0x56, 0x87, 0xd2, 0x9c, 0x72, 0x4d,
-	0x49, 0x45, 0x9d, 0x6d, 0x39, 0x03, 0x31, 0xf7, 0x9e, 0xc1, 0x1a, 0x97, 0xee, 0x02, 0xc7, 0xc1,
-	0x89, 0x8a, 0x2f, 0x89, 0x48, 0xed, 0x6e, 0x35, 0x9d, 0x38, 0x50, 0xf1, 0x65, 0xc6, 0x8d, 0xf9,
-	0x2c, 0xb7, 0x42, 0xdc, 0x74, 0x22, 0xe7, 0x3e, 0x04, 0x40, 0x17, 0x03, 0xbc, 0x2a, 0x4b, 0x48,
-	0x5a, 0x42, 0xe4, 0xd8, 0xdd, 0x97, 0x4d, 0xa8, 0xe4, 0x8f, 0x6f, 0xc0, 0xc9, 0x7c, 0xec, 0x5a,
-	0x61, 0xba, 0xd1, 0xc0, 0xf5, 0xde, 0x2a, 0x3d, 0xfd, 0x53, 0xa8, 0x2d, 0x63, 0xb7, 0xb1, 0x8c,
-	0x40, 0x61, 0x58, 0xa6, 0x8d, 0xa5, 0x20, 0xed, 0xfe, 0x31, 0x2c, 0xc7, 0x6a, 0x14, 0xb8, 0x1b,
-	0x34, 0xe4, 0x96, 0x63, 0x4f, 0x29, 0xf9, 0xd5, 0x58, 0x8d, 0x5a, 0x29, 0xc4, 0xbe, 0x85, 0x07,
-	0x44, 0x91, 0xd6, 0x35, 0x89, 0xa1, 0x0a, 0xdd, 0xd6, 0xb0, 0x1d, 0xe2, 0xca, 0x35, 0x34, 0xf1,
-	0xd0, 0x04, 0x29, 0x5d, 0x64, 0x60, 0x15, 0x70, 0x7e, 0x1c, 0xc0, 0xa3, 0x9f, 0xb5, 0x27, 0xc7,
-	0x56, 0x51, 0x61, 0xf3, 0x4a, 0x05, 0x72, 0xf3, 0x29, 0xac, 0x3a, 0x8d, 0xfc, 0xd6, 0x5c, 0x70,
-	0xaf, 0x8e, 0x46, 0xb5, 0x58, 0x8d, 0x3a, 0x13, 0xd4, 0x45, 0xc5, 0x11, 0xdd, 0x22, 0x42, 0x0e,
-	0xbc, 0x35, 0x8a, 0x4a, 0xac, 0x46, 0x5d, 0x42, 0xf0, 0x74, 0xd4, 0x28, 0x14, 0x32, 0x18, 0x2a,
-	0x75, 0x3e, 0x4e, 0x70, 0x0b, 0x2c, 0x3d, 0x1d, 0x9c, 0xe8, 0x22, 0xee, 0x3c, 0x6f, 0xc2, 0xdd,
-	0x69, 0x2e, 0xb9, 0x7b, 0x17, 0xd9, 0x6b, 0x45, 0x36, 0x79, 0xb9, 0x05, 0xd5, 0x53, 0x6e, 0xa3,
-	0xb3, 0x94, 0x77, 0x8f, 0x16, 0x47, 0x88, 0x08, 0x1f, 0x43, 0xcd, 0x79, 0x56, 0x08, 0xde, 0x3a,
-	0x9d, 0x89, 0x43, 0xf3, 0x80, 0xed, 0x40, 0xbd, 0xc0, 0x22, 0xad, 0x0f, 0x69, 0xb7, 0x39, 0x8f,
-	0xf4, 0x3e, 0x81, 0xba, 0x0c, 0x2f, 0xc4, 0x20, 0x2c, 0x24, 0xfb, 0x06, 0xed, 0x65, 0x82, 0x13,
-	0xf5, 0x09, 0xd4, 0x34, 0x8f, 0x85, 0x76, 0xe9, 0x40, 0x9d, 0xd9, 0x43, 0xe2, 0x4a, 0x86, 0x62,
-	0xeb, 0x75, 0xf9, 0x90, 0xd3, 0x9c, 0x7f, 0xf7, 0x29, 0x1f, 0x32, 0xcc, 0xb9, 0x57, 0x54, 0xa2,
-	0x25, 0x37, 0xa7, 0x95, 0xf2, 0x7b, 0x35, 0xfd, 0xc9, 0xf9, 0x11, 0x6d, 0x55, 0x17, 0x3f, 0x36,
-	0x71, 0x39, 0x93, 0x28, 0x69, 0x38, 0x2e, 0xf7, 0x20, 0x5b, 0x8e, 0xb0, 0x7c, 0xb9, 0x94, 0x42,
-	0x42, 0x0f, 0xb3, 0xe5, 0x08, 0x25, 0x25, 0x96, 0xd6, 0xed, 0x47, 0x54, 0x84, 0xb0, 0x16, 0xef,
-	0x40, 0x7d, 0x2c, 0x67, 0x02, 0xbe, 0x45, 0x81, 0x24, 0x3c, 0x0f, 0xf9, 0x67, 0xc0, 0xa6, 0x98,
-	0xb4, 0xd0, 0x36, 0x72, 0xeb, 0x05, 0x6e, 0xee, 0xf5, 0x0f, 0x4a, 0x9f, 0xbb, 0x82, 0x81, 0xbc,
-	0xc7, 0xe4, 0x35, 0x61, 0x44, 0xf9, 0x33, 0xac, 0xa4, 0x5f, 0xd1, 0x56, 0x8c, 0x5c, 0x26, 0x36,
-	0xb0, 0x13, 0x7c, 0x75, 0x9b, 0x4f, 0xd9, 0x3e, 0x0a, 0x1c, 0xa3, 0xbd, 0xbf, 0x6c, 0x0a, 0xa3,
-	0xc6, 0x39, 0x6c, 0xfc, 0x0c, 0xf1, 0xca, 0x6a, 0xbc, 0x0d, 0xd5, 0x98, 0x9b, 0x48, 0x8b, 0xc4,
-	0x4e, 0xbe, 0x9d, 0x8a, 0xd0, 0x54, 0xa5, 0x99, 0x9f, 0xae, 0x34, 0x07, 0x7f, 0x85, 0x2d, 0xa1,
-	0xde, 0xe9, 0xf8, 0x41, 0xbd, 0xf0, 0xf5, 0x89, 0x05, 0xbb, 0x57, 0xfa, 0xe3, 0xab, 0xff, 0xe3,
-	0x3f, 0x2e, 0x03, 0x2e, 0x9f, 0x0f, 0x66, 0xff, 0xc7, 0x72, 0xb2, 0x88, 0x93, 0x9f, 0xff, 0x37,
-	0x00, 0x00, 0xff, 0xff, 0xca, 0x8a, 0xed, 0x46, 0xc4, 0x11, 0x00, 0x00,
+var fileDescriptor_interaction_6e926e4a72872ffd = []byte{
+	// 1632 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x58, 0xcd, 0x72, 0x23, 0xb7,
+	0x11, 0x0e, 0xa9, 0xff, 0x1e, 0x8a, 0xa4, 0xb0, 0x96, 0x35, 0x3b, 0x5e, 0xaf, 0xa4, 0x4d, 0x5c,
+	0x66, 0x9c, 0x98, 0x2a, 0xcb, 0x29, 0xc7, 0xf9, 0x59, 0xa7, 0x24, 0x8a, 0x5b, 0xcb, 0x2c, 0x23,
+	0x33, 0x43, 0xed, 0xe6, 0xef, 0x30, 0x35, 0x9a, 0x81, 0x28, 0x14, 0x49, 0x60, 0x02, 0x80, 0xb4,
+	0xb9, 0x97, 0x5c, 0x73, 0xcb, 0xd3, 0xe4, 0x65, 0x72, 0xce, 0x83, 0xa4, 0xd0, 0x00, 0xc9, 0x21,
+	0x25, 0x6f, 0x2c, 0xfa, 0xa2, 0x02, 0xbe, 0xfe, 0xf0, 0xa1, 0xa7, 0xd1, 0xe8, 0x06, 0x05, 0xb7,
+	0x3d, 0xa6, 0x6f, 0x47, 0xd7, 0xf5, 0x44, 0x0c, 0x4f, 0x12, 0xca, 0xd5, 0x48, 0x7d, 0xca, 0xb8,
+	0xd2, 0x72, 0x34, 0xa4, 0x5c, 0xc7, 0x9a, 0x09, 0x7e, 0x22, 0x32, 0xca, 0x9d, 0x29, 0x93, 0x42,
+	0x8b, 0x13, 0x25, 0x93, 0x1c, 0x78, 0x62, 0x41, 0xc6, 0x35, 0x95, 0x71, 0x82, 0x2b, 0xc6, 0x9f,
+	0xe5, 0xa7, 0x75, 0x24, 0x90, 0xc3, 0xf9, 0x12, 0x8b, 0xd4, 0xf3, 0x9c, 0xf1, 0x67, 0xc1, 0xd3,
+	0x9e, 0x10, 0xbd, 0x01, 0xb5, 0x7a, 0xd7, 0xa3, 0x9b, 0x93, 0x6f, 0x64, 0x9c, 0x65, 0x54, 0x3a,
+	0x7a, 0xf0, 0x64, 0xd9, 0x6e, 0xdc, 0x4c, 0xb4, 0xb5, 0x3e, 0xfb, 0xf7, 0x21, 0x78, 0xad, 0xb9,
+	0x20, 0x79, 0x0c, 0xdb, 0x5a, 0xc6, 0x09, 0x8d, 0x58, 0xea, 0x17, 0x8e, 0x0a, 0xb5, 0x9d, 0x70,
+	0x0b, 0xe7, 0xad, 0x94, 0x1c, 0x82, 0xa7, 0xd9, 0x90, 0x46, 0x42, 0xb2, 0x1e, 0xe3, 0x7e, 0xf1,
+	0xa8, 0x50, 0x2b, 0x84, 0x60, 0xa0, 0xaf, 0x11, 0x21, 0x5f, 0xc0, 0x81, 0xa2, 0x72, 0x4c, 0x65,
+	0xc4, 0xe3, 0x31, 0xeb, 0x61, 0x18, 0x22, 0xa5, 0x63, 0xa9, 0xfd, 0x35, 0x24, 0xef, 0x5b, 0xf3,
+	0xe5, 0xcc, 0xda, 0x35, 0x46, 0xf2, 0x5b, 0x08, 0xee, 0xae, 0x4b, 0x47, 0x12, 0x07, 0xfe, 0x3a,
+	0x2e, 0xf5, 0x97, 0x97, 0x5e, 0x38, 0x3b, 0xe1, 0xf0, 0x28, 0xa3, 0xf2, 0x46, 0xc8, 0x61, 0xcc,
+	0x13, 0x1a, 0x51, 0xae, 0x25, 0xa3, 0xca, 0xdf, 0x38, 0x5a, 0xab, 0x79, 0xa7, 0xcf, 0xeb, 0xff,
+	0x27, 0x7c, 0xf5, 0xdc, 0xc7, 0xd7, 0x3b, 0x73, 0x9d, 0x26, 0xd7, 0x72, 0x12, 0x92, 0x6c, 0x11,
+	0x61, 0x54, 0x91, 0xdf, 0xc3, 0x86, 0xca, 0x62, 0xae, 0xfc, 0x4d, 0xdc, 0xe1, 0x17, 0x0f, 0xda,
+	0xe1, 0x4f, 0xf4, 0xba, 0x9b, 0xc5, 0x3c, 0xb4, 0x12, 0xe4, 0x6f, 0x50, 0x1a, 0xb0, 0x6b, 0x19,
+	0xcb, 0x49, 0xc4, 0xf8, 0x8d, 0xf0, 0xb7, 0x8e, 0x0a, 0x35, 0xef, 0xf4, 0xcb, 0x07, 0x49, 0xb6,
+	0xad, 0x40, 0x8b, 0xdf, 0x88, 0xd0, 0x1b, 0xcc, 0x27, 0x46, 0xdc, 0x04, 0x8d, 0x99, 0xc3, 0x34,
+	0xe2, 0xdb, 0x2b, 0x88, 0x77, 0xad, 0x80, 0x15, 0x57, 0xf3, 0x09, 0x11, 0xb0, 0x97, 0x0c, 0x18,
+	0xe5, 0x3a, 0x8a, 0xb5, 0x96, 0xec, 0x7a, 0xa4, 0xa9, 0xf2, 0x77, 0x30, 0x22, 0xe7, 0x0f, 0xda,
+	0xa1, 0x81, 0x2a, 0x67, 0x33, 0x11, 0x1b, 0xf8, 0x6a, 0xb2, 0x04, 0x07, 0xff, 0xf5, 0xa0, 0xba,
+	0x7c, 0x3e, 0xe4, 0x43, 0x00, 0x73, 0xde, 0x93, 0x48, 0x4f, 0x32, 0xea, 0xf2, 0x75, 0x07, 0x91,
+	0xab, 0x49, 0x46, 0x8d, 0x19, 0xd3, 0x2f, 0x32, 0x49, 0xea, 0x12, 0x76, 0x07, 0x91, 0x2b, 0x36,
+	0xa4, 0x24, 0x80, 0xed, 0x59, 0x96, 0xd9, 0x04, 0x9d, 0xcd, 0x09, 0x81, 0x75, 0x1e, 0x0f, 0x29,
+	0x66, 0xdf, 0x4e, 0x88, 0x63, 0x83, 0xe1, 0x3e, 0x1b, 0x16, 0x33, 0x63, 0xf2, 0x11, 0x94, 0x19,
+	0x67, 0x9a, 0xc5, 0x5a, 0x48, 0xeb, 0xc5, 0x26, 0x5a, 0x77, 0x67, 0x28, 0x7a, 0x72, 0x0c, 0xa5,
+	0x6f, 0x84, 0xec, 0x53, 0xe9, 0xee, 0xc3, 0x16, 0x6e, 0xe7, 0x59, 0xcc, 0xde, 0x82, 0x8f, 0xa0,
+	0x2c, 0x69, 0xca, 0x24, 0x4d, 0xb4, 0x23, 0x6d, 0x23, 0x69, 0x77, 0x8a, 0xde, 0xa5, 0x25, 0x62,
+	0xc4, 0xb5, 0xbf, 0x73, 0x54, 0xa8, 0x6d, 0xcc, 0x69, 0x0d, 0x03, 0x9a, 0x0d, 0x67, 0x34, 0xca,
+	0x53, 0x1f, 0xec, 0x86, 0x53, 0xac, 0xc9, 0xf1, 0x3e, 0xdf, 0x50, 0x9d, 0xdc, 0xba, 0xdd, 0x3c,
+	0x7b, 0x9f, 0x11, 0xb2, 0x5b, 0xd5, 0xe1, 0x51, 0x2a, 0x86, 0x31, 0xe3, 0xd1, 0x40, 0x88, 0xfe,
+	0x28, 0x73, 0xc4, 0x12, 0x12, 0xf7, 0xac, 0xa9, 0x8d, 0x16, 0xcb, 0xff, 0x04, 0xf6, 0x16, 0xf9,
+	0x66, 0xe3, 0x5d, 0x64, 0x57, 0xf2, 0x6c, 0xb3, 0xf9, 0x8f, 0x61, 0x37, 0x11, 0x9c, 0xcf, 0x3f,
+	0xb6, 0x8c, 0xbc, 0x92, 0x03, 0xad, 0x20, 0x16, 0x94, 0x64, 0x24, 0x69, 0xe4, 0xe0, 0x79, 0x41,
+	0xa9, 0x4c, 0x0b, 0x8a, 0x31, 0x37, 0x66, 0x56, 0xbb, 0xee, 0x10, 0xbc, 0xa9, 0xb8, 0x71, 0xa1,
+	0x6a, 0xbf, 0xcc, 0x41, 0x66, 0xf7, 0x4f, 0x60, 0x8f, 0xd3, 0x6f, 0x75, 0x74, 0x2b, 0xb2, 0x08,
+	0x33, 0x34, 0x11, 0x03, 0x7f, 0x0f, 0x0f, 0xae, 0x62, 0x0c, 0x2f, 0x45, 0xd6, 0x71, 0xb0, 0xf1,
+	0x54, 0xd2, 0xbf, 0x8f, 0xa8, 0x9a, 0x7a, 0x4a, 0xac, 0xa7, 0x0e, 0xcc, 0x9d, 0x8a, 0xca, 0x04,
+	0x57, 0xd4, 0xb1, 0x1e, 0x4d, 0x0f, 0xcf, 0xa2, 0x96, 0x86, 0xa7, 0xe2, 0x68, 0xc6, 0xb3, 0xf7,
+	0xa6, 0xa7, 0x62, 0x31, 0x17, 0x18, 0x2d, 0x63, 0xae, 0x6e, 0x4c, 0xae, 0xb0, 0xb7, 0xd4, 0xdf,
+	0x3f, 0x2a, 0xd4, 0xd6, 0xc2, 0xd2, 0x14, 0xec, 0xb2, 0xb7, 0xd4, 0xf8, 0x4f, 0x79, 0x22, 0x52,
+	0x9a, 0x46, 0xd7, 0x22, 0x9d, 0x58, 0xe2, 0xfb, 0x48, 0xac, 0x38, 0xc3, 0xb9, 0x48, 0x27, 0x53,
+	0x6e, 0x4a, 0x97, 0xb9, 0x07, 0x96, 0xeb, 0x0c, 0x33, 0xee, 0x5b, 0xd8, 0x75, 0x95, 0x58, 0xb3,
+	0x21, 0xe3, 0x3d, 0xdf, 0xc7, 0x1b, 0xfd, 0xfa, 0x07, 0x55, 0xd1, 0x3c, 0xd0, 0x45, 0xf5, 0x2b,
+	0x14, 0x0f, 0x4b, 0x2a, 0x37, 0x23, 0x3f, 0x07, 0x32, 0xe2, 0x03, 0x11, 0xa7, 0x11, 0x1d, 0x9b,
+	0xba, 0x62, 0xc3, 0xf8, 0x18, 0x23, 0x54, 0xb5, 0x96, 0xa6, 0x31, 0xd8, 0x48, 0xd6, 0xa0, 0xba,
+	0xc0, 0x36, 0xd1, 0x0c, 0x90, 0x5b, 0xce, 0x71, 0x4d, 0x40, 0x3f, 0x06, 0x93, 0x7c, 0xd1, 0xcc,
+	0xe1, 0x31, 0xf5, 0x3f, 0xb0, 0xc4, 0x54, 0x0c, 0x5b, 0x73, 0x94, 0x9c, 0xc3, 0x53, 0x43, 0x4c,
+	0x04, 0xd7, 0x46, 0xd1, 0x88, 0xd0, 0x45, 0x67, 0x9e, 0xe0, 0xba, 0x20, 0x15, 0xc3, 0x86, 0x25,
+	0xb5, 0x91, 0x93, 0x73, 0xeb, 0x2b, 0x78, 0xf2, 0x9d, 0x1a, 0xc6, 0xc5, 0x0f, 0x6d, 0x33, 0xbb,
+	0x57, 0xc1, 0x38, 0x7b, 0x0c, 0x25, 0xbb, 0x7e, 0x98, 0x0d, 0xa8, 0xa6, 0xfe, 0x53, 0x9b, 0x20,
+	0xc8, 0xb7, 0x10, 0xf9, 0x09, 0x94, 0x97, 0xbe, 0xfb, 0xd0, 0x26, 0xe4, 0xc2, 0x57, 0xd7, 0xa0,
+	0x7a, 0x27, 0x96, 0x47, 0xf6, 0xb3, 0x97, 0x22, 0x79, 0x08, 0x46, 0x1e, 0x5d, 0x35, 0x27, 0x7e,
+	0x6c, 0x2f, 0x4b, 0x2a, 0x86, 0x6d, 0x8b, 0x04, 0x7d, 0x38, 0xf8, 0x8e, 0x13, 0x9c, 0x55, 0xc9,
+	0x42, 0xae, 0x4a, 0x1e, 0x81, 0x97, 0x52, 0x95, 0x48, 0x96, 0x61, 0x61, 0x2d, 0xa2, 0x29, 0x0f,
+	0xbd, 0xab, 0xee, 0x06, 0xff, 0x29, 0xc1, 0x96, 0x6b, 0x92, 0xe4, 0x00, 0xb6, 0x4c, 0x9b, 0x9c,
+	0x3f, 0x45, 0x36, 0xcd, 0xb4, 0x95, 0x92, 0x14, 0x00, 0x1f, 0x25, 0x4a, 0xc7, 0xda, 0xd4, 0x75,
+	0x93, 0xa3, 0x17, 0xab, 0xf4, 0xe1, 0xfa, 0xd5, 0x4c, 0xc6, 0xf6, 0x9d, 0x9c, 0xae, 0x09, 0x74,
+	0x16, 0x4b, 0x0c, 0x9f, 0xf3, 0x62, 0x0d, 0xbd, 0x28, 0x59, 0xb4, 0x6b, 0x7d, 0xb9, 0xaf, 0x51,
+	0xfc, 0x11, 0xd6, 0xfb, 0x8c, 0xa7, 0xd8, 0x28, 0xca, 0x0f, 0x7c, 0x83, 0x4c, 0x3d, 0x33, 0x7f,
+	0x5e, 0x31, 0x9e, 0x86, 0x28, 0x45, 0xde, 0x83, 0x0d, 0x7b, 0x88, 0x9b, 0x18, 0x30, 0x3b, 0x21,
+	0x55, 0x58, 0x33, 0x09, 0x60, 0xbb, 0x89, 0x19, 0x92, 0x5f, 0x02, 0xe4, 0x1a, 0xb2, 0x6d, 0xf9,
+	0x07, 0x75, 0xfb, 0x04, 0xac, 0x4f, 0x9f, 0x80, 0xf5, 0x2e, 0x3e, 0x01, 0xc3, 0x1c, 0xd5, 0xa4,
+	0x81, 0xd2, 0x71, 0xd2, 0x8f, 0x30, 0x02, 0xd8, 0x54, 0x76, 0x42, 0x40, 0x08, 0x83, 0x44, 0x62,
+	0xf0, 0x62, 0xce, 0x85, 0x7d, 0xdd, 0x2a, 0x1f, 0x30, 0xea, 0xbf, 0x5b, 0xe9, 0xdb, 0xce, 0x66,
+	0x3a, 0x61, 0x5e, 0x93, 0xdc, 0x42, 0x79, 0x48, 0x95, 0x8a, 0x7b, 0xd4, 0xe6, 0xad, 0xf2, 0x3d,
+	0xdc, 0xe5, 0x6c, 0xa5, 0x5d, 0xfe, 0x60, 0xa5, 0x30, 0xd5, 0xc3, 0xdd, 0x61, 0x6e, 0xa6, 0xc8,
+	0xd7, 0xb0, 0x31, 0x60, 0xbc, 0xaf, 0xfc, 0x12, 0x6e, 0xf0, 0xab, 0x95, 0x36, 0x68, 0x33, 0xde,
+	0x0f, 0xad, 0x0e, 0xe9, 0xc2, 0xa6, 0xc9, 0x9a, 0x91, 0xc2, 0x86, 0xe7, 0x9d, 0xfe, 0x66, 0xb5,
+	0x43, 0x47, 0x89, 0xd0, 0x49, 0x91, 0x3f, 0xc3, 0x07, 0x2a, 0x1e, 0x52, 0xd3, 0xa2, 0x12, 0xaa,
+	0x54, 0x14, 0xab, 0x28, 0x97, 0x91, 0xd8, 0x32, 0xbd, 0xd3, 0xe0, 0xce, 0xe9, 0x9e, 0x0b, 0x31,
+	0x78, 0x13, 0x0f, 0x46, 0x34, 0x3c, 0x30, 0xcb, 0x3b, 0x76, 0xf5, 0x99, 0xea, 0xcc, 0xf2, 0x96,
+	0xbc, 0x80, 0x6a, 0x72, 0xcb, 0x06, 0xa9, 0x4d, 0x6d, 0xfb, 0x8e, 0xa8, 0xa0, 0xdc, 0x93, 0x3b,
+	0x72, 0xaf, 0x5b, 0x5c, 0x7f, 0x7e, 0x6a, 0x05, 0xcb, 0xb8, 0xca, 0x48, 0xe0, 0x33, 0x23, 0x78,
+	0x0e, 0x95, 0xa5, 0x2b, 0x64, 0x72, 0xb2, 0x4f, 0x27, 0xee, 0xc6, 0x9a, 0xa1, 0xc9, 0xdd, 0xb1,
+	0x59, 0xed, 0x6a, 0x81, 0x9d, 0xfc, 0xba, 0xf8, 0x65, 0x21, 0xf8, 0x0b, 0xc0, 0x3c, 0x17, 0xf0,
+	0x7d, 0xc5, 0x5c, 0x35, 0x29, 0x84, 0x38, 0x5e, 0xca, 0xe7, 0xe2, 0xf7, 0xce, 0xe7, 0xe0, 0x9f,
+	0x05, 0x28, 0xe5, 0x33, 0xe0, 0x5e, 0xf5, 0x32, 0x14, 0x59, 0x8a, 0xaa, 0xeb, 0x61, 0x91, 0xa5,
+	0xe4, 0x67, 0xb0, 0x37, 0xe2, 0xa6, 0xf8, 0x4a, 0xaa, 0x14, 0x4d, 0x6d, 0xaf, 0x5c, 0x43, 0x73,
+	0x35, 0x6f, 0xc0, 0x66, 0xf9, 0x31, 0x54, 0x96, 0xa9, 0xeb, 0x48, 0x2d, 0x2f, 0x12, 0x83, 0x7f,
+	0x15, 0x61, 0xdd, 0xe4, 0xca, 0xbb, 0x7e, 0x5c, 0xe5, 0x6a, 0x5d, 0x71, 0xa1, 0xd6, 0x85, 0xee,
+	0xd1, 0xb9, 0x86, 0xb5, 0xe4, 0xab, 0x95, 0x13, 0xb5, 0x6e, 0xde, 0xa1, 0xee, 0xd1, 0xba, 0x18,
+	0xd4, 0xf5, 0xef, 0x1d, 0xd4, 0x67, 0x2f, 0x60, 0x1d, 0x9f, 0xb3, 0x15, 0xf0, 0x5e, 0x5f, 0x76,
+	0x3b, 0xcd, 0x46, 0xeb, 0x45, 0xab, 0x79, 0x51, 0xfd, 0x11, 0xd9, 0x87, 0xbd, 0xc6, 0xcb, 0x56,
+	0xfb, 0x22, 0x6a, 0xb7, 0x2e, 0x5f, 0x35, 0x2f, 0xa2, 0x6e, 0xe7, 0xec, 0xb2, 0x5a, 0x20, 0xef,
+	0x03, 0xe9, 0x9c, 0x85, 0xcd, 0xcb, 0xab, 0x05, 0xbc, 0x18, 0x7c, 0x01, 0x9b, 0x36, 0xd5, 0xcd,
+	0xa9, 0x98, 0x27, 0x08, 0x86, 0x63, 0x23, 0xc4, 0x31, 0xf1, 0x61, 0xcb, 0xdd, 0x56, 0x17, 0x8b,
+	0xe9, 0xf4, 0xd9, 0x73, 0xd8, 0x9e, 0xd6, 0x45, 0xf2, 0x18, 0xf6, 0x8d, 0x5a, 0xf4, 0xaa, 0x75,
+	0x79, 0x11, 0x2d, 0x7a, 0x03, 0xb0, 0xd9, 0x6d, 0x86, 0x6f, 0x9a, 0x61, 0xb5, 0x60, 0xc6, 0x8d,
+	0x76, 0xab, 0x79, 0x79, 0x55, 0x2d, 0x06, 0x31, 0x78, 0xb9, 0x5f, 0x4b, 0xe6, 0x00, 0xa7, 0xbf,
+	0xbe, 0xc6, 0x54, 0xaa, 0x79, 0xb7, 0x2a, 0x3b, 0xf8, 0x8d, 0x45, 0xc9, 0x4f, 0xa1, 0x4a, 0xbf,
+	0xcd, 0x84, 0xd4, 0x54, 0xce, 0x98, 0xb6, 0x17, 0x54, 0xa6, 0xb8, 0xa3, 0x06, 0xc7, 0xe0, 0xe5,
+	0x7e, 0x33, 0xdd, 0xd7, 0x20, 0x83, 0x06, 0xec, 0xdf, 0xfb, 0xa3, 0xe7, 0x21, 0x37, 0xe7, 0xfc,
+	0x1f, 0x70, 0xc8, 0xc4, 0x3b, 0x93, 0xe1, 0xbc, 0x9a, 0x4b, 0x05, 0x7c, 0xcd, 0x76, 0x0a, 0x7f,
+	0x7d, 0xb9, 0xc2, 0xff, 0x2d, 0x7a, 0x94, 0x7f, 0xda, 0x5b, 0xfe, 0x4f, 0xc5, 0xf5, 0x26, 0x1a,
+	0x3f, 0xff, 0x5f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x85, 0xc0, 0xef, 0xd2, 0x0a, 0x11, 0x00, 0x00,
 }
