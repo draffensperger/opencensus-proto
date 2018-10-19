@@ -60,141 +60,171 @@
     "InteractionPerformanceEntry": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
-        "initiator_type": {
-          "type": "string"
-        },
-        "next_hop_protocol": {
-          "type": "string"
-        },
         "entry_type": {
-          "type": "string"
-        },
-        "secure_connection_start": {
-          "type": "number",
-          "format": "double"
-        },
-        "transfer_size": {
-          "type": "number",
-          "format": "double"
-        },
-        "encoded_body_size": {
-          "type": "number",
-          "format": "double"
-        },
-        "decoded_body_size": {
-          "type": "number",
-          "format": "double"
+          "type": "string",
+          "description": "Type of performnce entry e.g. \"navigation\" or \"resource\"."
         },
         "start_time": {
           "type": "number",
-          "format": "double"
+          "format": "double",
+          "description": "The first timestamp of the entry, e.g. for a resource timing, the time\nright before the browser starts the fetch."
         },
         "duration": {
           "type": "number",
-          "format": "double"
+          "format": "double",
+          "description": "The duration of the performance entry in milliseconds."
         },
-        "connect_end": {
-          "type": "number",
-          "format": "double"
-        },
-        "connect_start": {
-          "type": "number",
-          "format": "double"
-        },
-        "dom_complete": {
-          "type": "number",
-          "format": "double"
-        },
-        "dom_content_loaded_event_end": {
-          "type": "number",
-          "format": "double"
-        },
-        "dom_content_loaded_event_start": {
-          "type": "number",
-          "format": "double"
-        },
-        "dom_interactive": {
-          "type": "number",
-          "format": "double"
-        },
-        "dom_loading": {
-          "type": "number",
-          "format": "double"
-        },
-        "domain_lookup_end": {
-          "type": "number",
-          "format": "double"
-        },
-        "domain_lookup_start": {
-          "type": "number",
-          "format": "double"
-        },
-        "fetch_start": {
-          "type": "number",
-          "format": "double"
-        },
-        "load_event_end": {
-          "type": "number",
-          "format": "double"
-        },
-        "load_event_start": {
-          "type": "number",
-          "format": "double"
-        },
-        "navigation_start": {
-          "type": "number",
-          "format": "double"
-        },
-        "redirect_count": {
-          "type": "number",
-          "format": "double"
-        },
-        "redirect_end": {
-          "type": "number",
-          "format": "double"
-        },
-        "redirect_start": {
-          "type": "number",
-          "format": "double"
-        },
-        "request_start": {
-          "type": "number",
-          "format": "double"
-        },
-        "response_end": {
-          "type": "number",
-          "format": "double"
-        },
-        "response_start": {
-          "type": "number",
-          "format": "double"
+        "name": {
+          "type": "string",
+          "description": "URL of the retrieved resource or page."
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "The type of navigation for a navigation entry."
         },
-        "unload_event_end": {
-          "type": "number",
-          "format": "double"
-        },
-        "unload_event_start": {
-          "type": "number",
-          "format": "double"
+        "initiator_type": {
+          "type": "string",
+          "description": "The type of resource that initiated the performance event."
         },
         "worker_start": {
           "type": "number",
-          "format": "double"
+          "format": "double",
+          "description": "If the document has an active service worker registration, this is\ntime right before the browser ran the worker or fired the `fetch` event."
+        },
+        "redirect_start": {
+          "type": "number",
+          "format": "double",
+          "description": "If there are HTTP redirects when navigating and if all are from the same\norigin, this is the start time of the fetch that initiated the redirect."
+        },
+        "redirect_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of redirects since the last non-redirect navigation."
+        },
+        "redirect_end": {
+          "type": "number",
+          "format": "double",
+          "description": "The time right after receiving the last byte of the last redirect."
+        },
+        "fetch_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the browser checks caches for a resource."
+        },
+        "domain_lookup_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the browser starts the domain name lookup."
+        },
+        "domain_lookup_end": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right after the browser finishes the domain name lookup."
+        },
+        "connect_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the browser starts establishing the server connection.\nIf a persistent connection is used or the resource is retrieved from\ncache, this will match domain_lookup_end."
+        },
+        "secure_connection_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the browser starts the handshake to secure the\nconnection, or zero if a secure connection is not used."
+        },
+        "connect_end": {
+          "type": "number",
+          "format": "double",
+          "description": "The time right after the browser finishes establishing the\nconnection. If a persistent connection is used or the resource is\nretrieved from cache, this will match domain_lookup_end."
+        },
+        "next_hop_protocol": {
+          "type": "string",
+          "description": "The network protocol used to fetch the resource, as identified by the\nALPN Protocol ID."
+        },
+        "request_start": {
+          "type": "number",
+          "format": "double",
+          "description": "The time right before the browser starts requesting the resource\nfrom the server or cache."
+        },
+        "response_start": {
+          "type": "number",
+          "format": "double",
+          "description": "The time right after the browser's HTTP parser receives the\nfirst byte of the response."
+        },
+        "response_end": {
+          "type": "number",
+          "format": "double",
+          "description": "The time right after the browser receives the last byte of the\nresponse."
+        },
+        "transfer_size": {
+          "type": "string",
+          "format": "int64",
+          "description": "The number of bytes received from a HTTP-network fetch, consumed by the\nresponse header fields and response payload."
+        },
+        "encoded_body_size": {
+          "type": "string",
+          "format": "int64",
+          "description": "Compressed size of the payload body in bytes."
+        },
+        "decoded_body_size": {
+          "type": "string",
+          "format": "int64",
+          "description": "Uncompressed size of the payload body in bytes."
         },
         "server_timing": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/PerformanceEntryPerformanceServerTiming"
-          }
+          },
+          "description": "Server timings associated with the performance entry."
+        },
+        "unload_event_start": {
+          "type": "number",
+          "format": "double",
+          "description": "If the previous document and the current document have the same same\norigin, this attribute must return the time right after the user\nagent finishes the unload event of the previous document. If there is no\nprevious document or the previous document has a different origin than\nthe current document or the unload is not yet completed, this attribute\nmust return zero."
+        },
+        "unload_event_end": {
+          "type": "number",
+          "format": "double",
+          "description": "If the previous document and the current document have the same origin\n[RFC6454], this attribute must return the time right before the\nbrowser starts the unload event of the previous document. If there is\nno previous document or the previous document has a different origin than\nthe current document, this attribute must return zero."
+        },
+        "dom_interactive": {
+          "type": "number",
+          "format": "double",
+          "description": "This attribute must return the time right before the browser\nsets the current document readiness to \"interactive\"."
+        },
+        "dom_content_loaded_event_start": {
+          "type": "number",
+          "format": "double",
+          "description": "This attribute must return the time right before the browser\nfires the DOMContentLoaded event at the Document."
+        },
+        "dom_content_loaded_event_end": {
+          "type": "number",
+          "format": "double",
+          "description": "This attribute must return the time right after the document's\nDOMContentLoaded event completes."
+        },
+        "dom_complete": {
+          "type": "number",
+          "format": "double",
+          "description": "This attribute must return the time right before the browser\nsets the current document readiness to \"complete\"."
+        },
+        "load_event_end": {
+          "type": "number",
+          "format": "double",
+          "description": "This attribute must return the time right before the load event of\nthe current document is fired. It must return zero when the load event is\nnot fired yet."
+        },
+        "load_event_start": {
+          "type": "number",
+          "format": "double",
+          "description": "This attribute must return the time when the load event of the current\ndocument is completed. It must return zero when the load event is not\nfired or is not completed."
+        },
+        "dom_loading": {
+          "type": "number",
+          "format": "double",
+          "description": "Deprecated in Navigation Timing Level 2 Spec. This attribute must return\nthe time right before the browser sets the current document\nreadiness to \"loading\". Due to differences in when a Document object is\ncreated in existing browsers, the value returned by the domLoading is\nimplementation specific and should not be used in meaningful metrics."
         }
       },
-      "title": "Performance data from `performance.getEntries()` retrieved after this\ninteraction ended. Sending the raw performance entries allows the\nJavaScript client code sending the measurements code to be lighter weight.\nThe agent can then use these entries to generate spans with accurate\nnetwork times, annotations and messages events.\nSee https://www.w3.org/TR/performance-timeline/"
+      "description": "Sending the raw performance entries allows the JavaScript client code\no be smaller. The OpenCensus agent web interceptor can use these entries to\ngenerate detailed spans.",
+      "title": "Performance data from `performance.getEntries()` retrieved after this\ninteraction ended. All timings are in milleconds since the browser\nnavigation start. Values may be zero if the browser security policy\ndoes not permit reading the field, e.g. if the resource requested is\nfrom another domain and no matching Timing-Allow-Origin header is sent.\nSee detailed specs at:\nhttps://www.w3.org/TR/performance-timeline-2/\nhttps://www.w3.org/TR/resource-timing-2/\nhttps://www.w3.org/TR/navigation-timing-2/\nhttps://www.w3.org/TR/server-timing/"
     },
     "InteractionServiceInfo": {
       "type": "object",
@@ -236,10 +266,7 @@
           "format": "double"
         },
         "attributes": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/protobufStruct"
         },
         "stack_trace": {
           "type": "string"
@@ -292,16 +319,20 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Metric name sent by the server."
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "description": "Metric description sent by the server."
         },
         "duration": {
           "type": "number",
-          "format": "double"
+          "format": "double",
+          "description": "Metric value sent by the server."
         }
-      }
+      },
+      "title": "Timing entries sent by the server via the Server-Timing header.\nSee https://www.w3.org/TR/server-timing/"
     },
     "WebSpanAnnotation": {
       "type": "object",
@@ -311,10 +342,7 @@
           "format": "double"
         },
         "attributes": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/protobufStruct"
         }
       }
     },
@@ -331,10 +359,7 @@
           "$ref": "#/definitions/LinkType"
         },
         "attributes": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/protobufStruct"
         }
       }
     },
@@ -384,6 +409,72 @@
       },
       "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs.\nThis proto's fields are a subset of those of\n[google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto),\nwhich is used by [gRPC](https://github.com/grpc)."
     },
+    "protobufListValue": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufValue"
+          },
+          "description": "Repeated field of dynamically typed values."
+        }
+      },
+      "description": "`ListValue` is a wrapper around a repeated field of values.\n\nThe JSON representation for `ListValue` is JSON array."
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "protobufStruct": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/protobufValue"
+          },
+          "description": "Unordered map of dynamically typed values."
+        }
+      },
+      "description": "`Struct` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `Struct`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `Struct` is JSON object."
+    },
+    "protobufValue": {
+      "type": "object",
+      "properties": {
+        "null_value": {
+          "$ref": "#/definitions/protobufNullValue",
+          "description": "Represents a null value."
+        },
+        "number_value": {
+          "type": "number",
+          "format": "double",
+          "description": "Represents a double value."
+        },
+        "string_value": {
+          "type": "string",
+          "description": "Represents a string value."
+        },
+        "bool_value": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Represents a boolean value."
+        },
+        "struct_value": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "Represents a structured value."
+        },
+        "list_value": {
+          "$ref": "#/definitions/protobufListValue",
+          "description": "Represents a repeated `Value`."
+        }
+      },
+      "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
+    },
     "v1ExportInteractionsRequest": {
       "type": "object",
       "properties": {
@@ -424,7 +515,8 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/InteractionPerformanceEntry"
-          }
+          },
+          "description": "Web performance entries associated with the interaction."
         },
         "spans": {
           "type": "array",

@@ -47,10 +47,12 @@ message Span {
   // This field is required.
   bytes span_id = 2;
 
-  // This field conveys information about request position in multiple distributed tracing graphs.
-  // It is a list of Tracestate.Entry with a maximum of 32 members in the list.
+  // This field conveys information about request position in multiple
+  // distributed tracing graphs. It is a list of Tracestate.Entry with a maximum
+  // of 32 members in the list.
   //
-  // See the https://github.com/w3c/distributed-tracing for more details about this field.
+  // See the https://github.com/w3c/distributed-tracing for more details about
+  // this field.
   message Tracestate {
     message Entry {
       // The key must begin with a lowercase letter, and can only contain
@@ -271,9 +273,9 @@ message Span {
   google.protobuf.UInt32Value child_span_count = 13;
 }
 
-// The `Status` type defines a logical error model that is suitable for different
-// programming environments, including REST APIs and RPC APIs. This proto's fields
-// are a subset of those of
+// The `Status` type defines a logical error model that is suitable for
+// different programming environments, including REST APIs and RPC APIs. This
+// proto's fields are a subset of those of
 // [google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto),
 // which is used by [gRPC](https://github.com/grpc).
 message Status {
@@ -365,12 +367,12 @@ message Module {
 
 // A string that might be shortened to a specified length.
 message TruncatableString {
-  // The shortened string. For example, if the original string was 500 bytes long and
-  // the limit of the string was 128 bytes, then this value contains the first 128
-  // bytes of the 500-byte string. Note that truncation always happens on a
-  // character boundary, to ensure that a truncated string is still valid UTF-8.
-  // Because it may contain multi-byte characters, the size of the truncated string
-  // may be less than the truncation limit.
+  // The shortened string. For example, if the original string was 500 bytes
+  // long and the limit of the string was 128 bytes, then this value contains
+  // the first 128 bytes of the 500-byte string. Note that truncation always
+  // happens on a character boundary, to ensure that a truncated string is still
+  // valid UTF-8. Because it may contain multi-byte characters, the size of the
+  // truncated string may be less than the truncation limit.
   string value = 1;
 
   // The number of bytes removed from the original string. If this

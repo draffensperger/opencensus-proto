@@ -18,6 +18,7 @@ syntax = "proto3";
 package opencensus.proto.interaction.v1;
 
 import "google/protobuf/wrappers.proto";
+import "google/protobuf/struct.proto";
 
 option go_package = "github.com/census-instrumentation/opencensus-proto/gen-go/interaction/v1";
 
@@ -56,54 +57,168 @@ message Interaction {
   double server_navigation_duration = 4;
 
   // Performance data from `performance.getEntries()` retrieved after this
-  // interaction ended. Sending the raw performance entries allows the
-  // JavaScript client code sending the measurements code to be lighter weight.
-  // The agent can then use these entries to generate spans with accurate
-  // network times, annotations and messages events.
-  // See https://www.w3.org/TR/performance-timeline/
+  // interaction ended. All timings are in milleconds since the browser
+  // navigation start. Values may be zero if the browser security policy
+  // does not permit reading the field, e.g. if the resource requested is
+  // from another domain and no matching Timing-Allow-Origin header is sent.
+  // See detailed specs at:
+  // https://www.w3.org/TR/performance-timeline-2/
+  // https://www.w3.org/TR/resource-timing-2/
+  // https://www.w3.org/TR/navigation-timing-2/
+  // https://www.w3.org/TR/server-timing/
+  //
+  // Sending the raw performance entries allows the JavaScript client code
+  // o be smaller. The OpenCensus agent web interceptor can use these entries to
+  // generate detailed spans.
   message PerformanceEntry {
-    string name = 1;
-    string initiator_type = 2;
-    string next_hop_protocol = 3;
-    string entry_type = 4;
-    double secure_connection_start = 5;
-    double transfer_size = 6;
-    double encoded_body_size = 7;
-    double decoded_body_size = 8;
-    double start_time = 9;
-    double duration = 10;
-    double connect_end = 11;
-    double connect_start = 12;
-    double dom_complete = 13;
-    double dom_content_loaded_event_end = 14;
-    double dom_content_loaded_event_start = 15;
-    double dom_interactive = 16;
-    double dom_loading = 17;
-    double domain_lookup_end = 18;
-    double domain_lookup_start = 19;
-    double fetch_start = 20;
-    double load_event_end = 21;
-    double load_event_start = 22;
-    double navigation_start = 23;
-    double redirect_count = 24;
-    double redirect_end = 25;
-    double redirect_start = 26;
-    double request_start = 27;
-    double response_end = 28;
-    double response_start = 29;
-    string type = 30;
-    double unload_event_end = 31;
-    double unload_event_start = 32;
-    double worker_start = 33;
+    // Type of performnce entry e.g. "navigation" or "resource".
+    string entry_type = 1;
 
+    // The first timestamp of the entry, e.g. for a resource timing, the time
+    // right before the browser starts the fetch.
+    double start_time = 2;
+
+    // The duration of the performance entry in milliseconds.
+    double duration = 3;
+
+    // URL of the retrieved resource or page.
+    string name = 4;
+
+    // The type of navigation for a navigation entry.
+    string type = 5;
+
+    // The type of resource that initiated the performance event.
+    string initiator_type = 6;
+
+    // If the document has an active service worker registration, this is
+    // time right before the browser ran the worker or fired the `fetch` event.
+    double worker_start = 7;
+
+    // If there are HTTP redirects when navigating and if all are from the same
+    // origin, this is the start time of the fetch that initiated the redirect.
+    double redirect_start = 8;
+
+    // Number of redirects since the last non-redirect navigation.
+    int32 redirect_count = 9;
+
+    // The time right after receiving the last byte of the last redirect.
+    double redirect_end = 10;
+
+    // Time right before the browser checks caches for a resource.
+    double fetch_start = 11;
+
+    // Time right before the browser starts the domain name lookup.
+    double domain_lookup_start = 12;
+
+    // Time right after the browser finishes the domain name lookup.
+    double domain_lookup_end = 13;
+
+    // Time right before the browser starts establishing the server connection.
+    // If a persistent connection is used or the resource is retrieved from
+    // cache, this will match domain_lookup_end.
+    double connect_start = 14;
+
+    // Time right before the browser starts the handshake to secure the
+    // connection, or zero if a secure connection is not used.
+    double secure_connection_start = 15;
+
+    // LEFT OFF
+
+    // The time right after the browser finishes establishing the
+    // connection. If a persistent connection is used or the resource is
+    // retrieved from cache, this will match domain_lookup_end.
+    double connect_end = 16;
+
+    // The network protocol used to fetch the resource, as identified by the
+    // ALPN Protocol ID.
+    string next_hop_protocol = 17;
+
+    // The time right before the browser starts requesting the resource
+    // from the server or cache.
+    double request_start = 18;
+
+    // The time right after the browser's HTTP parser receives the
+    // first byte of the response.
+    double response_start = 19;
+
+    // The time right after the browser receives the last byte of the
+    // response.
+    double response_end = 20;
+
+    // The number of bytes received from a HTTP-network fetch, consumed by the
+    // response header fields and response payload.
+    int64 transfer_size = 21;
+
+    // Compressed size of the payload body in bytes.
+    int64 encoded_body_size = 22;
+
+    // Uncompressed size of the payload body in bytes.
+    int64 decoded_body_size = 23;
+
+    // Timing entries sent by the server via the Server-Timing header.
+    // See https://www.w3.org/TR/server-timing/
     message PerformanceServerTiming {
+      // Metric name sent by the server.
       string name = 1;
+      // Metric description sent by the server.
       string description = 2;
+      // Metric value sent by the server.
       double duration = 3;
     }
-    repeated PerformanceServerTiming server_timing = 34;
+
+    // Server timings associated with the performance entry.
+    repeated PerformanceServerTiming server_timing = 24;
+
+    // If the previous document and the current document have the same same
+    // origin, this attribute must return the time right after the user
+    // agent finishes the unload event of the previous document. If there is no
+    // previous document or the previous document has a different origin than
+    // the current document or the unload is not yet completed, this attribute
+    // must return zero.
+    double unload_event_start = 25;
+
+    // If the previous document and the current document have the same origin
+    // [RFC6454], this attribute must return the time right before the
+    // browser starts the unload event of the previous document. If there is
+    // no previous document or the previous document has a different origin than
+    // the current document, this attribute must return zero.
+    double unload_event_end = 26;
+
+    // This attribute must return the time right before the browser
+    // sets the current document readiness to "interactive".
+    double dom_interactive = 27;
+
+    // This attribute must return the time right before the browser
+    // fires the DOMContentLoaded event at the Document.
+    double dom_content_loaded_event_start = 28;
+
+    // This attribute must return the time right after the document's
+    // DOMContentLoaded event completes.
+    double dom_content_loaded_event_end = 29;
+
+    // This attribute must return the time right before the browser
+    // sets the current document readiness to "complete".
+    double dom_complete = 30;
+
+    // This attribute must return the time right before the load event of
+    // the current document is fired. It must return zero when the load event is
+    // not fired yet.
+    double load_event_end = 31;
+
+    // This attribute must return the time when the load event of the current
+    // document is completed. It must return zero when the load event is not
+    // fired or is not completed.
+    double load_event_start = 32;
+
+    // Deprecated in Navigation Timing Level 2 Spec. This attribute must return
+    // the time right before the browser sets the current document
+    // readiness to "loading". Due to differences in when a Document object is
+    // created in existing browsers, the value returned by the domLoading is
+    // implementation specific and should not be used in meaningful metrics.
+    double dom_loading = 33;
   }
 
+  // Web performance entries associated with the interaction.
   repeated PerformanceEntry performance_entries = 5;
 
   // A WebSpan is similar to main OpenCensus Span, but is designed to be easier
@@ -137,12 +252,12 @@ message Interaction {
 
     double start = 6;
     double end = 7;
-    map<string, string> attributes = 8;
+    google.protobuf.Struct attributes = 8;
     string stack_trace = 9;
 
     message Annotation {
       double time = 1;
-      map<string, string> attributes = 2;
+      google.protobuf.Struct attributes = 2;
     }
 
     repeated Annotation annotations = 10;
@@ -173,7 +288,7 @@ message Interaction {
 
       Type type = 3;
 
-      map<string, string> attributes = 4;
+      google.protobuf.Struct attributes = 4;
     }
     repeated Link links = 12;
 
