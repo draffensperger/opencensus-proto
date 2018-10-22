@@ -1,5 +1,4 @@
 // Copyright 2016-18, OpenCensus Authors
-
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,14 +46,14 @@ message Interaction {
   // between the client and server. This should be sent from the web server to
   // client as a value in a <script> tag in the rendered HTML. A value of 0
   // indicates that it is missing.
-  double server_navigation_start = 3;
+  double server_request_start = 3;
 
-  // The time in milliseconds between when the frontend web server received the
-  // request to render the web UI template until it began sending its response.
-  // This is measured by the server clock and is used to adjust for clock skew
-  // between client and server. This should also be sent from server to client
-  // via the rendered HTML, and a value of 0 indicates that it is missing.
-  double server_navigation_duration = 4;
+  // The time in milliseconds since the epoch that the frontend web server
+  // started sending the response to render the web UI template. This is
+  // measured by the server clock and is used to adjust for clock skew between
+  // client and server. This should also be sent from server to client via the
+  // rendered HTML, and a value of 0 indicates that it is missing.
+  double server_response_start = 4;
 
   // Performance data from `performance.getEntries()` retrieved after this
   // interaction ended. All timings are in milleconds since the browser
@@ -122,31 +121,24 @@ message Interaction {
     // connection, or zero if a secure connection is not used.
     double secure_connection_start = 15;
 
-    // LEFT OFF
-
-    // The time right after the browser finishes establishing the
-    // connection. If a persistent connection is used or the resource is
-    // retrieved from cache, this will match domain_lookup_end.
+    // Time right after the browser finishes establishing the connection.
+    // If a persistent connection is used or the resource is retrieved from
+    // cache, this will match domain_lookup_end.
     double connect_end = 16;
 
-    // The network protocol used to fetch the resource, as identified by the
-    // ALPN Protocol ID.
+    // Network protocol used to fetch the resource by ALPN Protocol ID.
     string next_hop_protocol = 17;
 
-    // The time right before the browser starts requesting the resource
-    // from the server or cache.
+    // Time right before the browser starts requesting the resource.
     double request_start = 18;
 
-    // The time right after the browser's HTTP parser receives the
-    // first byte of the response.
+    // Time right after the browser receives the first byte of the response.
     double response_start = 19;
 
-    // The time right after the browser receives the last byte of the
-    // response.
+    // Time right after the browser receives the last byte of the response.
     double response_end = 20;
 
-    // The number of bytes received from a HTTP-network fetch, consumed by the
-    // response header fields and response payload.
+    // Number of bytes received from a HTTP fetch from both headers and payload.
     int64 transfer_size = 21;
 
     // Compressed size of the payload body in bytes.
@@ -169,68 +161,62 @@ message Interaction {
     // Server timings associated with the performance entry.
     repeated PerformanceServerTiming server_timing = 24;
 
-    // If the previous document and the current document have the same same
-    // origin, this attribute must return the time right after the user
-    // agent finishes the unload event of the previous document. If there is no
-    // previous document or the previous document has a different origin than
-    // the current document or the unload is not yet completed, this attribute
-    // must return zero.
+    // Time right before browser starts the unload event of previous document.
+    // If previous document was from different origin, this is zero.
     double unload_event_start = 25;
 
-    // If the previous document and the current document have the same origin
-    // [RFC6454], this attribute must return the time right before the
-    // browser starts the unload event of the previous document. If there is
-    // no previous document or the previous document has a different origin than
-    // the current document, this attribute must return zero.
+    // Time right after browser finishes the unload event of previous document.
+    // If previous document was from different origin, this is zero.
     double unload_event_end = 26;
 
-    // This attribute must return the time right before the browser
-    // sets the current document readiness to "interactive".
+    // Time right before the browser sets document readiness to "interactive".
     double dom_interactive = 27;
 
-    // This attribute must return the time right before the browser
-    // fires the DOMContentLoaded event at the Document.
+    // Time right before the browser fires DOMContentLoaded event.
     double dom_content_loaded_event_start = 28;
 
-    // This attribute must return the time right after the document's
-    // DOMContentLoaded event completes.
+    // Time right after the DOMContentLoaded event completes.
     double dom_content_loaded_event_end = 29;
 
-    // This attribute must return the time right before the browser
-    // sets the current document readiness to "complete".
+    // Time right before the browser sets document readiness to "complete".
     double dom_complete = 30;
 
-    // This attribute must return the time right before the load event of
-    // the current document is fired. It must return zero when the load event is
-    // not fired yet.
+    // Time right before the load event of the current document is fired.
     double load_event_end = 31;
 
-    // This attribute must return the time when the load event of the current
-    // document is completed. It must return zero when the load event is not
-    // fired or is not completed.
+    // Time when the load event of the current document is completed.
     double load_event_start = 32;
 
-    // Deprecated in Navigation Timing Level 2 Spec. This attribute must return
-    // the time right before the browser sets the current document
-    // readiness to "loading". Due to differences in when a Document object is
-    // created in existing browsers, the value returned by the domLoading is
-    // implementation specific and should not be used in meaningful metrics.
+    // Deprecated in Navigation Timing Level 2 Spec.
+    // Time when the browser sets document readiness to "loading".
+    // Due to browser differences this should not be used in meaningful metrics.
     double dom_loading = 33;
   }
 
   // Web performance entries associated with the interaction.
   repeated PerformanceEntry performance_entries = 5;
 
-  // A WebSpan is similar to main OpenCensus Span, but is designed to be easier
-  // for browser JavaScript to write via HTTP through grpc-gateway. All spans
-  // for an interaction are assumed to have the same trace ID, specified above
-  // (otherwise send two interactions with links).
+  // A Span is similar to main OpenCensus Span, but is designed to be easier
+  // for browser JavaScript to write via HTTP-JSON that will be converted to
+  // the proto via jsonpb. All spans for an interaction are assumed to have the
+  // same trace ID, specified above (otherwise send two interactions with
+  // links).
   // See
   // https://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/trace/v1/trace.proto
-  message WebSpan {
+  message Span {
+    // A unique identifier for a span within the interaction. It is 8-bytes
+    // encoded as a hexadecimal string.
     string span_id = 1;
+
+    // Information about request position in multiple distributed tracing
+    // graphs. See https://github.com/w3c/distributed-tracing for details.
     map<string, string> tracestate = 2;
+
+    // The `span_id` of this span's parent span. If this is a root span, then
+    // this field must be empty. It is 8-bytes encoded as a hexadecimal string.
     string parent_span_id = 3;
+
+    // A description of the span's operation.
     string name = 4;
 
     // Type of span. Can be used to specify additional relationships between
@@ -250,28 +236,83 @@ message Interaction {
     }
     SpanKind kind = 5;
 
+    // Span start time as measured by browser performance clock (the result of
+    // calling `performance.now()`). This is the number of milliseconds since
+    // the browser clock timeOrigin (the start of the navigation).
     double start = 6;
+
+    // Span end time in browser performance clock milliseconds.
     double end = 7;
+
+    // Attributes associated with the span. Defining this as a Struct makes it
+    // easier for the JavaScript client to send attributes as normal JSON
+    // values. JSON booleans, strings and numbers will be converted to the
+    // trace.v1.Span.AttributeValue string_value, bool_value or double_value
+    // fields respectively. To specify an int value in JSON use e.g.
+    // {intValue:"2"} as the attribute value.
     google.protobuf.Struct attributes = 8;
+
+    // Unparse JavaScript stack trace associated with this span. This will be
+    // the value of `Error.stack`.
     string stack_trace = 9;
 
+    // A time stamped text annotation with a set of attributes.
     message Annotation {
+      // Time the event occurred in performance clock milliseconds.
       double time = 1;
+
+      // Attributes for the event.
       google.protobuf.Struct attributes = 2;
     }
 
+    // Time stamped text annotations for events associated with the span.
     repeated Annotation annotations = 10;
 
+    // An event describing a message sent/received between Spans.
     message MessageEvent {
+      // Time the message was sent/received in performance clock milliseconds.
       double time = 1;
-      uint64 id = 2;
-      uint64 uncompressed_size = 3;
-      uint64 compressed_size = 4;
+
+      // Indicates whether the message was sent or received.
+      enum Type {
+        // Unknown event type.
+        TYPE_UNSPECIFIED = 0;
+        // Indicates a sent message.
+        SENT = 1;
+        // Indicates a received message.
+        RECEIVED = 2;
+      }
+
+      // MessageEvent type. Indicates whether the message was sent or received.
+      Type type = 2;
+
+      // An identifier for the MessageEvent's message that can be used to match
+      // SENT and RECEIVED MessageEvents. For example, this field could
+      // represent a sequence ID for a streaming RPC. It is recommended to be
+      // unique within a Span.
+      uint64 id = 3;
+
+      // The number of uncompressed bytes sent or received.
+      uint64 uncompressed_size = 4;
+
+      // The number of compressed bytes sent or received. If zero, assumed to
+      // be the same size as uncompressed.
+      uint64 compressed_size = 5;
     }
+
+    // Message events associated with the span
     repeated MessageEvent message_events = 11;
 
+    // A pointer from the current span to another span in the same trace or in a
+    // different trace. For example, this can be used in batching operations,
+    // where a single batch handler processes multiple requests from different
+    // traces or when the handler receives a request from a different project.
     message Link {
+      // Unique identifier for linked trace. It is a 16-byte hex-encoded string.
       string trace_id = 1;
+
+      // Unique identifier for span within linked trace. It is a 16-byte
+      // hex-encoded string.
       string span_id = 2;
 
       // The relationship of the current span relative to the linked span:
@@ -288,6 +329,7 @@ message Interaction {
 
       Type type = 3;
 
+      // Attributes about the trace link.
       google.protobuf.Struct attributes = 4;
     }
     repeated Link links = 12;
@@ -298,7 +340,7 @@ message Interaction {
     // [google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto),
     // which is used by [gRPC](https://github.com/grpc).
     message Status {
-      // The HTTP status code associated with the.
+      // The HTTP status code associated with the span.
       int32 code = 1;
       // A developer-facing error message, which should be in English.
       string message = 2;
@@ -317,7 +359,8 @@ message Interaction {
     // spans. This will typically be computed automatically by the interceptor.
     google.protobuf.UInt32Value child_span_count = 15;
   }
-  repeated WebSpan spans = 6;
+
+  repeated Span spans = 6;
 
   // Information about the OpenCensus web library that measured the interaction.
   // This is a simplified version of the LibraryInfo message used to write
