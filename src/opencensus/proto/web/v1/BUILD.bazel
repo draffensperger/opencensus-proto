@@ -17,26 +17,26 @@ package(default_visibility = ["//visibility:public"])
 load("@org_pubref_rules_protobuf//go:rules.bzl", "go_proto_library")
 
 proto_library(
-    name = "interaction_proto",
-    srcs = ["interaction.proto"],
+    name = "web_proto",
+    srcs = ["web.proto"],
     deps = [
         "@com_google_protobuf//:wrappers_proto",
     ],
 )
 
 cc_proto_library(
-    name = "interaction_proto_cc",
-    deps = [":interaction_proto"],
+    name = "web_proto_cc",
+    deps = [":web_proto"],
 )
 
 java_proto_library(
-    name = "interaction_proto_java",
-    deps = [":interaction_proto"],
+    name = "web_proto_java",
+    deps = [":web_proto"],
 )
 
 go_proto_library(
-    name = "interaction_proto_go",
-    protos = ["interaction.proto"],
+    name = "web_proto_go",
+    protos = ["web.proto"],
     imports = [
         "external/com_google_protobuf/src",
     ],

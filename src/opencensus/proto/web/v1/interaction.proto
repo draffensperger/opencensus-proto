@@ -14,16 +14,19 @@
 
 syntax = "proto3";
 
-package opencensus.proto.interaction.v1;
+// NOTE: This proto is experimental and is subject to change at this point.
+// Please do not use it at the moment.
+
+package opencensus.proto.web.v1;
 
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/struct.proto";
 
-option go_package = "github.com/census-instrumentation/opencensus-proto/gen-go/interaction/v1";
+option go_package = "github.com/census-instrumentation/opencensus-proto/gen-go/web/v1";
 
 option java_multiple_files = true;
-option java_package = "io.opencensus.proto.interaction";
-option java_outer_classname = "InteractionProto";
+option java_package = "io.opencensus.proto.web";
+option java_outer_classname = "WebProto";
 
 // A measurable user interaction within a web browser client. This could be an
 // initial page load, a route transition within a single page application, or an
