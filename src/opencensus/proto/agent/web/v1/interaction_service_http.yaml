@@ -13,13 +13,12 @@
 # limitations under the License.
 
 # These is an API configuration to generate an HTTP/JSON -> gRPC gateway for the
-# OpenCensus exporter service using github.com/grpc-ecosystem/grpc-gateway.
-
+# OpenCensus agent web interaction service using grpc-gateway.
+# See: github.com/grpc-ecosystem/grpc-gateway.
 type: google.api.Service
 config_version: 3
-
 http:
  rules:
- - selector: opencensus.proto.agent.interaction.v1.InteractionService.Export
+ - selector: opencensus.proto.agent.web.v1.InteractionService.Export
    post: /v1/interactions/export
    body: "*"

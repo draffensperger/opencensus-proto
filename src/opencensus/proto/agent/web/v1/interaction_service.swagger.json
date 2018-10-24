@@ -1,0 +1,582 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "github.com/census-instrumentation/opencensus-proto/src/opencensus/proto/agent/web/v1/interaction_service.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/interactions/export": {
+      "post": {
+        "operationId": "Export",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v1ExportInteractionsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ExportInteractionsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "InteractionService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "InteractionLibraryInfo": {
+      "type": "object",
+      "properties": {
+        "library_version": {
+          "type": "string",
+          "description": "The version of the OpenCensus web client library."
+        },
+        "exporter_version": {
+          "type": "string",
+          "description": "The version of the OpenCensus web Agent exporter library. If omitted,\nthis is assumed to be the same as `library_version`."
+        }
+      },
+      "title": "Information about the OpenCensus web library that measured the interaction.\nThis is a simplified version of the LibraryInfo message used to write\nserver side Spans. There is no `Language` field currently as we assume the\nlanguage writing web interaction data is browser JavaScript. See\nhttps://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/agent/common/v1/common.proto"
+    },
+    "InteractionPerformanceEntry": {
+      "type": "object",
+      "properties": {
+        "entry_type": {
+          "type": "string",
+          "description": "Type of performnce entry e.g. \"navigation\" or \"resource\"."
+        },
+        "start_time": {
+          "type": "number",
+          "format": "double",
+          "description": "The first timestamp of the entry, e.g. for a resource timing, the time\nright before the browser starts the fetch."
+        },
+        "duration": {
+          "type": "number",
+          "format": "double",
+          "description": "The duration of the performance entry in milliseconds."
+        },
+        "name": {
+          "type": "string",
+          "description": "URL of the retrieved resource or page."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of navigation for a navigation entry."
+        },
+        "initiator_type": {
+          "type": "string",
+          "description": "The type of resource that initiated the performance event."
+        },
+        "worker_start": {
+          "type": "number",
+          "format": "double",
+          "description": "If the document has an active service worker registration, this is\ntime right before the browser ran the worker or fired the `fetch` event."
+        },
+        "redirect_start": {
+          "type": "number",
+          "format": "double",
+          "description": "If there are HTTP redirects when navigating and if all are from the same\norigin, this is the start time of the fetch that initiated the redirect."
+        },
+        "redirect_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of redirects since the last non-redirect navigation."
+        },
+        "redirect_end": {
+          "type": "number",
+          "format": "double",
+          "description": "The time right after receiving the last byte of the last redirect."
+        },
+        "fetch_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the browser checks caches for a resource."
+        },
+        "domain_lookup_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the browser starts the domain name lookup."
+        },
+        "domain_lookup_end": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right after the browser finishes the domain name lookup."
+        },
+        "connect_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the browser starts establishing the server connection.\nIf a persistent connection is used or the resource is retrieved from\ncache, this will match domain_lookup_end."
+        },
+        "secure_connection_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the browser starts the handshake to secure the\nconnection, or zero if a secure connection is not used."
+        },
+        "connect_end": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right after the browser finishes establishing the connection.\nIf a persistent connection is used or the resource is retrieved from\ncache, this will match domain_lookup_end."
+        },
+        "next_hop_protocol": {
+          "type": "string",
+          "description": "Network protocol used to fetch the resource by ALPN Protocol ID."
+        },
+        "request_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the browser starts requesting the resource."
+        },
+        "response_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right after the browser receives the first byte of the response."
+        },
+        "response_end": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right after the browser receives the last byte of the response."
+        },
+        "transfer_size": {
+          "type": "string",
+          "format": "int64",
+          "description": "Number of bytes received from a HTTP fetch from both headers and payload."
+        },
+        "encoded_body_size": {
+          "type": "string",
+          "format": "int64",
+          "description": "Compressed size of the payload body in bytes."
+        },
+        "decoded_body_size": {
+          "type": "string",
+          "format": "int64",
+          "description": "Uncompressed size of the payload body in bytes."
+        },
+        "server_timing": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PerformanceEntryPerformanceServerTiming"
+          },
+          "description": "Server timings associated with the performance entry."
+        },
+        "unload_event_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before browser starts the unload event of previous document.\nIf previous document was from different origin, this is zero."
+        },
+        "unload_event_end": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right after browser finishes the unload event of previous document.\nIf previous document was from different origin, this is zero."
+        },
+        "dom_interactive": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the browser sets document readiness to \"interactive\"."
+        },
+        "dom_content_loaded_event_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the browser fires DOMContentLoaded event."
+        },
+        "dom_content_loaded_event_end": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right after the DOMContentLoaded event completes."
+        },
+        "dom_complete": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the browser sets document readiness to \"complete\"."
+        },
+        "load_event_end": {
+          "type": "number",
+          "format": "double",
+          "description": "Time right before the load event of the current document is fired."
+        },
+        "load_event_start": {
+          "type": "number",
+          "format": "double",
+          "description": "Time when the load event of the current document is completed."
+        },
+        "dom_loading": {
+          "type": "number",
+          "format": "double",
+          "description": "Deprecated in Navigation Timing Level 2 Spec.\nTime when the browser sets document readiness to \"loading\".\nDue to browser differences this should not be used in meaningful metrics."
+        }
+      },
+      "description": "Sending the raw performance entries allows the JavaScript client code\no be smaller. The OpenCensus agent web interceptor can use these entries to\ngenerate detailed spans.",
+      "title": "Performance data from `performance.getEntries()` retrieved after this\ninteraction ended. All timings are in milleconds since the browser\nnavigation start. Values may be zero if the browser security policy\ndoes not permit reading the field, e.g. if the resource requested is\nfrom another domain and no matching Timing-Allow-Origin header is sent.\nSee detailed specs at:\nhttps://www.w3.org/TR/performance-timeline-2/\nhttps://www.w3.org/TR/resource-timing-2/\nhttps://www.w3.org/TR/navigation-timing-2/\nhttps://www.w3.org/TR/server-timing/"
+    },
+    "InteractionServiceInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the service."
+        }
+      },
+      "description": "Service description for the web UI that generated the interaction."
+    },
+    "InteractionSpan": {
+      "type": "object",
+      "properties": {
+        "span_id": {
+          "type": "string",
+          "description": "A unique identifier for a span within the interaction. It is 8-bytes\nencoded as a hexadecimal string."
+        },
+        "tracestate": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Information about request position in multiple distributed tracing\ngraphs. See https://github.com/w3c/distributed-tracing for details."
+        },
+        "parent_span_id": {
+          "type": "string",
+          "description": "The `span_id` of this span's parent span. If this is a root span, then\nthis field must be empty. It is 8-bytes encoded as a hexadecimal string."
+        },
+        "name": {
+          "type": "string",
+          "description": "A description of the span's operation."
+        },
+        "kind": {
+          "$ref": "#/definitions/SpanSpanKind"
+        },
+        "start": {
+          "type": "number",
+          "format": "double",
+          "description": "Span start time as measured by browser performance clock (the result of\ncalling `performance.now()`). This is the number of milliseconds since\nthe browser clock timeOrigin (the start of the navigation).\nIf this value is missing for an HTTP network call span, it can be\ninferred from the web performance entry for that network call."
+        },
+        "end": {
+          "type": "number",
+          "format": "double",
+          "description": "Span end time in browser performance clock milliseconds.\nIf this value is missing for an HTTP network call span, it can be\ninferred from the web performance entry for that network call."
+        },
+        "attributes": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "Attributes associated with the span. Defining this as a Struct makes it\neasier for the JavaScript client to send attributes as normal JSON\nvalues. JSON booleans, strings and numbers will be converted to the\ntrace.v1.Span.AttributeValue string_value, bool_value or double_value\nfields respectively. To specify an int value in JSON use e.g.\n{intValue:\"2\"} as the attribute value."
+        },
+        "stack_trace": {
+          "type": "string",
+          "description": "Unparse JavaScript stack trace associated with this span. This will be\nthe value of `Error.stack`."
+        },
+        "annotations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SpanAnnotation"
+          },
+          "description": "Time stamped text annotations for events associated with the span."
+        },
+        "message_events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SpanMessageEvent"
+          },
+          "title": "Message events associated with the span"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SpanLink"
+          }
+        },
+        "status": {
+          "$ref": "#/definitions/SpanStatus"
+        },
+        "same_process_as_parent_span": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "A highly recommended but not required flag that identifies when a trace\ncrosses a process boundary. True when the parent_span belongs to the\nsame process as the current span.\nThis will typically be defaulted to true by the web interceptor."
+        },
+        "child_span_count": {
+          "type": "integer",
+          "format": "int64",
+          "description": "An optional number of child spans that were generated while this span\nwas active. If set, allows an implementation to detect missing child\nspans. This will typically be computed automatically by the interceptor."
+        }
+      },
+      "title": "A Span is similar to main OpenCensus Span, but is designed to be easier\nfor browser JavaScript to write via HTTP-JSON that will be converted to\nthe proto via jsonpb. All spans for an interaction are assumed to have the\nsame trace ID, specified above (otherwise send two interactions with\nlinks).\nSee\nhttps://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/trace/v1/trace.proto"
+    },
+    "PerformanceEntryPerformanceServerTiming": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Metric name sent by the server."
+        },
+        "description": {
+          "type": "string",
+          "description": "Metric description sent by the server."
+        },
+        "duration": {
+          "type": "number",
+          "format": "double",
+          "description": "Metric value sent by the server."
+        }
+      },
+      "title": "Timing entries sent by the server via the Server-Timing header.\nSee https://www.w3.org/TR/server-timing/"
+    },
+    "SpanAnnotation": {
+      "type": "object",
+      "properties": {
+        "time": {
+          "type": "number",
+          "format": "double",
+          "description": "Time the event occurred in performance clock milliseconds."
+        },
+        "attributes": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "Attributes for the event."
+        }
+      },
+      "description": "A time stamped text annotation with a set of attributes."
+    },
+    "SpanLink": {
+      "type": "object",
+      "properties": {
+        "trace_id": {
+          "type": "string",
+          "description": "Unique identifier for linked trace. It is a 16-byte hex-encoded string."
+        },
+        "span_id": {
+          "type": "string",
+          "description": "Unique identifier for span within linked trace. It is a 16-byte\nhex-encoded string."
+        },
+        "type": {
+          "$ref": "#/definitions/SpanLinkType"
+        },
+        "attributes": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "Attributes about the trace link."
+        }
+      },
+      "description": "A pointer from the current span to another span in the same trace or in a\ndifferent trace. For example, this can be used in batching operations,\nwhere a single batch handler processes multiple requests from different\ntraces or when the handler receives a request from a different project."
+    },
+    "SpanLinkType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "CHILD_LINKED_SPAN",
+        "PARENT_LINKED_SPAN"
+      ],
+      "default": "UNSPECIFIED",
+      "description": "The relationship of the current span relative to the linked span:\nchild, parent, or unspecified.\n\n - UNSPECIFIED: The relationship of the two spans is unknown, or known but other\nthan parent-child.\n - CHILD_LINKED_SPAN: The linked span is a child of the current span.\n - PARENT_LINKED_SPAN: The linked span is a parent of the current span."
+    },
+    "SpanMessageEvent": {
+      "type": "object",
+      "properties": {
+        "time": {
+          "type": "number",
+          "format": "double",
+          "description": "Time the message was sent/received in performance clock milliseconds."
+        },
+        "type": {
+          "$ref": "#/definitions/SpanMessageEventType",
+          "description": "MessageEvent type. Indicates whether the message was sent or received."
+        },
+        "id": {
+          "type": "string",
+          "format": "uint64",
+          "description": "An identifier for the MessageEvent's message that can be used to match\nSENT and RECEIVED MessageEvents. For example, this field could\nrepresent a sequence ID for a streaming RPC. It is recommended to be\nunique within a Span."
+        },
+        "uncompressed_size": {
+          "type": "string",
+          "format": "uint64",
+          "description": "The number of uncompressed bytes sent or received."
+        },
+        "compressed_size": {
+          "type": "string",
+          "format": "uint64",
+          "description": "The number of compressed bytes sent or received. If zero, assumed to\nbe the same size as uncompressed."
+        }
+      },
+      "description": "An event describing a message sent/received between Spans."
+    },
+    "SpanMessageEventType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNSPECIFIED",
+        "SENT",
+        "RECEIVED"
+      ],
+      "default": "TYPE_UNSPECIFIED",
+      "description": "Indicates whether the message was sent or received.\n\n - TYPE_UNSPECIFIED: Unknown event type.\n - SENT: Indicates a sent message.\n - RECEIVED: Indicates a received message."
+    },
+    "SpanSpanKind": {
+      "type": "string",
+      "enum": [
+        "SPAN_KIND_UNSPECIFIED",
+        "SERVER",
+        "CLIENT"
+      ],
+      "default": "SPAN_KIND_UNSPECIFIED",
+      "description": "Type of span. Can be used to specify additional relationships between\nspans in addition to a parent/child relationship.\n\n - SPAN_KIND_UNSPECIFIED: Unspecified.\n - SERVER: Indicates that the span covers server-side handling of an RPC or other\nremote network request.\n - CLIENT: Indicates that the span covers the client-side wrapper around an RPC or\nother remote request.\nThese will be joined with browser performance data."
+    },
+    "SpanStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The HTTP status code associated with the span."
+        },
+        "message": {
+          "type": "string",
+          "description": "A developer-facing error message, which should be in English."
+        }
+      },
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs.\nThis proto's fields are a subset of those of\n[google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto),\nwhich is used by [gRPC](https://github.com/grpc)."
+    },
+    "protobufListValue": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufValue"
+          },
+          "description": "Repeated field of dynamically typed values."
+        }
+      },
+      "description": "`ListValue` is a wrapper around a repeated field of values.\n\nThe JSON representation for `ListValue` is JSON array."
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "protobufStruct": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/protobufValue"
+          },
+          "description": "Unordered map of dynamically typed values."
+        }
+      },
+      "description": "`Struct` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `Struct`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `Struct` is JSON object."
+    },
+    "protobufValue": {
+      "type": "object",
+      "properties": {
+        "null_value": {
+          "$ref": "#/definitions/protobufNullValue",
+          "description": "Represents a null value."
+        },
+        "number_value": {
+          "type": "number",
+          "format": "double",
+          "description": "Represents a double value."
+        },
+        "string_value": {
+          "type": "string",
+          "description": "Represents a string value."
+        },
+        "bool_value": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Represents a boolean value."
+        },
+        "struct_value": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "Represents a structured value."
+        },
+        "list_value": {
+          "$ref": "#/definitions/protobufListValue",
+          "description": "Represents a repeated `Value`."
+        }
+      },
+      "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
+    },
+    "v1ExportInteractionsRequest": {
+      "type": "object",
+      "properties": {
+        "interactions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Interaction"
+          }
+        }
+      }
+    },
+    "v1ExportInteractionsResponse": {
+      "type": "object"
+    },
+    "v1Interaction": {
+      "type": "object",
+      "properties": {
+        "trace_id": {
+          "type": "string",
+          "description": "The trace ID for the user interaction. All spans within an interaction are\npart of the same trace. The ID is a 16-byte array encoded in hexadecimal."
+        },
+        "time_origin": {
+          "type": "number",
+          "format": "double",
+          "title": "The time origin of the performance clock in the browser session that\ncollected this interaction, measured as milliseconds since the epoch.\nSee https://www.w3.org/TR/hr-time/"
+        },
+        "server_request_start": {
+          "type": "number",
+          "format": "double",
+          "description": "The time in milliseconds since the epoch that the frontend web server\nreceived the request to render the initial template for the web UI. This\ntime is measured by the server's clock and is used to adjust for clock skew\nbetween the client and server. This should be sent from the web server to\nclient as a value in a \u003cscript\u003e tag in the rendered HTML. A value of 0\nindicates that it is missing."
+        },
+        "server_response_start": {
+          "type": "number",
+          "format": "double",
+          "description": "The time in milliseconds since the epoch that the frontend web server\nstarted sending the response to render the web UI template. This is\nmeasured by the server clock and is used to adjust for clock skew between\nclient and server. This should also be sent from server to client via the\nrendered HTML, and a value of 0 indicates that it is missing."
+        },
+        "performance_entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InteractionPerformanceEntry"
+          },
+          "description": "Web performance entries associated with the interaction."
+        },
+        "spans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InteractionSpan"
+          }
+        },
+        "library_info": {
+          "$ref": "#/definitions/InteractionLibraryInfo",
+          "description": "OpenCensus web library info."
+        },
+        "service_info": {
+          "$ref": "#/definitions/InteractionServiceInfo",
+          "description": "Service description for the web UI."
+        },
+        "client_attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Attributes associated with web client that generated the interaction. This\ncould be related to the end user (e.g. user ID, session ID) or could be\nrelated to the web UI service (e.g. serving region, environment type).\nThis plays a similar role to the Node `attributes` field.\nSee\nhttps://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/agent/common/v1/common.proto"
+        }
+      },
+      "description": "A measurable user interaction within a web browser client. This could be an\ninitial page load, a route transition within a single page application, or an\non-page user interaction such as clicking a button. This proto contains all\nthe information needed for the web interaction interceptor to generate spans\nand metrics related to the interaction."
+    }
+  }
+}
